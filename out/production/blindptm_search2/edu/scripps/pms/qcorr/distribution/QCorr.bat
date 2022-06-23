@@ -1,0 +1,1 @@
+java -Xmx400m -jar c:\QCorr\QCorr.jar %1

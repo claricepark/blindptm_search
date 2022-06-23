@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+	<!--"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd"-->
+<!-- Note.  There is a bug in code generation tool of Hibernate.  java.sql.Date, java.sql.Timestamp, etc
+will be converted into java.util.Date, which causes errors.  Persistant classes needs to be manually fixed... :(
+Robin.  01/21/2005  -->
+
+<hibernate-mapping>
+    <!-- CF data -->
+   <class name="edu.scripps.pms.models.db.cf.IpProtocol" table="ip_protocol" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="antibodyId" column="antibody_id" type="java.lang.String" />
+	<property name="protocol" column="protocol" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.Antibody" table="antibody" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="source" column="source" type="java.lang.String" />
+	<property name="antigenName" column="antigen_name" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.Drug" table="drug" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="source" column="source" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.Gene" table="gene" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="refseqAcc" column="refseq_acc" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.Vector" table="vector" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="source" column="source" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.CellLine" table="cell_line" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.GeneRegulationType" table="gene_regulation_type" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="geneRegulationType" column="gene_regulation_type" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.Treatment" table="treatment" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="protocol" column="treatment_protocol_id" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.TreatmentUsesDrug" table="treatment_uses_drug" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="drugId" column="drug_id" type="java.lang.String" />
+	<property name="treatmentId" column="treatment_id" type="java.lang.String" />
+	<property name="amount" column="amount" type="java.lang.String" />
+	<property name="unit" column="unit" type="java.lang.String" />
+	<property name="note" column="note" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.TreatmentProtocol" table="treatment_protocol" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+	<property name="protocol" column="protocol" type="java.lang.String" />
+	<property name="note" column="note" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.cf.CfSample" table="cf_sample" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="sampleName" column="sample_name" type="java.lang.String" />
+	<property name="treatmentId" column="treatment_id" type="java.lang.String" />
+	<property name="ipProtocolId" column="ip_protocol_id" type="java.lang.String" />
+	<property name="numDishes" column="num_dishes" type="java.lang.String" />
+	<property name="cellLine" column="cell_line_id" type="java.lang.String" />
+	<property name="preparedBy" column="prepared_by" type="java.lang.String" />
+	<property name="handledBy" column="handled_by" type="java.lang.String" />
+	<property name="inputBy" column="input_by" type="java.lang.String" />
+	<property name="date" column="date" type="java.sql.Date" />
+	<property name="modifiedTime" column="modified_time" type="java.sql.Timestamp" />
+   </class>
+</hibernate-mapping>

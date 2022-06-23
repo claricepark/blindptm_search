@@ -1,0 +1,59 @@
+package scripts;
+
+import jcuda.driver.CUstream;
+import edu.scripps.pms.mspid.*;
+import blazmass.dbindex.DBIndexer;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import edu.scripps.pms.util.io.SpectrumReader;
+import edu.scripps.pms.util.spectrum.*;
+import java.util.*;
+import static jcuda.driver.JCudaDriver.cuStreamSynchronize;
+
+public class GPUMockTest {
+    public static void main(String[] args) throws Exception {
+
+System.out.println("run..");
+
+        CudaDeviceContext context = new CudaDeviceContext(0,false);
+        CudaDeviceContext.SINGLE_SCAN_MODE_PTX = "/home/ip2/dockerip2/ip2sys/calcXScoresSingleScan.ptx";
+        context.prepare();
+       // cuCtxSetCurrent(context.getContext());
+        SearchParams sp = new SearchParams("","/home/ip2/3090test/search.xml");
+        MassCalculator mc = new MassCalculator(sp);
+       DBIndexer db = ProlucidSearchEngine.createDBIndexer(sp);
+        CUstream stream = new CUstream();
+        BlockingQueue<PeptideUploadPrimitives> primitivesBlockingQueue = new LinkedBlockingQueue<>();
+        for(int i=0; i<300; i++)
+        {
+            primitivesBlockingQueue.add(new PeptideUploadPrimitives());
+        }
+        GPUResourceManager resourceManager = new GPUResourceManager(sp, mc, 75, 6000, context ,stream);
+        CudaBinomial cudaBinomial = new CudaBinomial(context.getSetBinomial(),mc);
+        cudaBinomial.assignBinomials(stream);
+        GPUSearchInterface gpuSearchInterface = SpectraSearch.generateWorkSpace(sp, context, db, resourceManager, primitivesBlockingQueue);
+      //  for(int j =0 ; j<2; j++)
+      //  {
+            SpectrumReader spectrumReader
+                    = new SpectrumReader("/home/ip2/3090test/test.ms2","ms2");
+                    //= new SpectrumReader(args[0], "ms2");
+            Iterator<PeakList> peakListIterator = spectrumReader.getSpectra();
+            while(peakListIterator.hasNext())
+            {
+                PeakList peakList = peakListIterator.next();
+                Iterator<Zline> zItr = peakList.getZlinesIterator();
+                while(zItr.hasNext())
+                {
+                    Zline zline = zItr.next();
+                    SearchResult sr =  gpuSearchInterface.search(zline,peakList);
+                    System.out.println(sr.outputResults());
+                }
+            }
+       // }
+        cuStreamSynchronize(stream);
+        //cuStreamDestroy(stream);
+        resourceManager.free();
+
+    }
+}

@@ -1,0 +1,245 @@
+#!/usr/bin/perl -T
+# SeqCov
+# A script written to develop a CGI linked to DTASelect output and representing the peptide sequence coverage of a given locus
+# Version 0.5, 04/22/2002
+# Johannes Graumann, California Institute of Technology
+
+$! =1;
+
+# check for QUERY_STRING truncation ...
+	$truncalarm = 0;
+	unless ($ENV{QUERY_STRING} =~ /\*[\s]*?/) {
+		++$truncalarm;
+	}
+# take input from CGI call ...
+	my $input = $ENV{QUERY_STRING};
+# remove URL-encoding (special attention to "|") ...
+	$input =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+# Stop people from using subshells to execute commands ...
+	$input =~ s/~!/ ~!/g;
+# split the query input at "&" ...
+	my @inputs = split ("&",$input);
+	chomp (@inputs);
+# extract data base path ...
+	$dbase = shift (@inputs);
+# extract locus name ...
+	$locus = shift (@inputs);
+# go and get locus sequence from data base ...
+	open (DBASE,"$dbase") or die "Can't open $dbase: $!\n";
+	$dbcb = 0;
+	my $alignstring;			#!
+	while ($dbline = <DBASE>) {
+		if ($dbcb < 1) { 
+			if ($dbline =~ /^>\Q$locus\E[\s]/ || /^>\Q$locus\E/) {
+				# initiate mode shift for sequence grabbing ...
+				$dbcb = 1;
+				# grab complete ORF annotation from data base (after removing ">") ...  
+				$dbline =~ s/^>//;
+				$locuscomplete = $dbline;
+				chomp ($locuscomplete);					#!
+			}	
+		}
+		else {
+			# encountering proper FASTA ORF end ...
+			if ($dbline =~ /\*/) {
+				$dbcb = 0;
+			}
+			# no proper FASTA ORF end: terminate at next locus name (">") ...
+			if ($dbline =~ /^>/) {
+				$dbcb = 0;
+			}
+			else {
+				# pack the sequence into one big string ...
+				chomp ($dbline);
+				$alignstring = "$alignstring$dbline";
+		       }
+		}
+	}
+# remove any characters aside from \w and \* from the $alignstring
+	$alignstring =~ s/[^\w\*]//g;
+# counting residues of the ORF aligning to ...
+	while ($alignstring =~ /\w/g) { 
+		$residueno++;
+	}
+# counting all characters in $alignstring (including ORFending "*") ...
+	while ($alignstring =~ /[\w\*]/g) { 
+		$completeno++;
+	}
+# positioning the coverage bars ... 
+	my @outputs;
+	for $a (0 .. $#inputs) {
+		# remove trailing "*" ... 
+		$inputs[$a] =~ s/\*//;
+		# split seqence coverage into seperate streches ...
+		@workarray = split (/\^/,$inputs[$a]);
+		chomp (@workarray);
+		$spacerlength = 0;
+		for $b (0 .. $#workarray) {
+			# extract coverage data if it is complete ...
+			if ($workarray[$b] =~ /^([\d]+)\+([\d]+)?/) {
+				$startno = $1 - 1;
+				$strech = $2;
+				# calculate numbers for proper stacking of coverage streches and assemble them ...
+				$spacer = $startno - $spacerlength;
+				$outputs[$a] = $outputs[$a] . " " x $spacer . "-" x $strech;
+				$spacerlength = length($outputs[$a]);
+			} 
+		}
+		@workarray = ();
+	}
+# chop sequence and coverage bars into pieces of $piecelength and group it in blocks of 10 for presentation ...
+	$piecelength = 80; # should be multiple of 10 ...
+	my @alignstringformated = $alignstring =~ /(.{1,$piecelength})/g;
+		for $c (0 .. $#alignstringformated) {
+			@workarray = $alignstringformated[$c] =~ /(.{1,10})/g;
+			chomp (@workarray);
+			for $d (0 .. $#workarray) {
+				$workarray[$d] =~ s/R/<font color=\"red\">R<\/font>/g;
+				$workarray[$d] =~ s/K/<font color=\"red\">K<\/font>/g;
+			}
+			$alignstringformated[$c] = "@workarray";
+			@workarray = ();
+		}			
+	my @outputsformated;
+	for $c (0 .. $#outputs) {
+		@workarray = $outputs[$c] =~  /(.{1,$piecelength})/g;
+		for $d (0 .. $#workarray) {
+			@workarraytwo = $workarray[$d] =~ /(.{1,10})/g;
+			$workarray[$d] = "@workarraytwo";
+			@workarraytwo = ();
+		}
+		@outputsformated = (
+			@outputsformated,
+			[@workarray]
+		);
+		@workarray = ();
+	}
+	@outputs = ();
+
+# start giving out html ...
+	print "Content-type: text/html\n\n";
+	print "<html>\n";
+	print "<HEAD>\n";
+	print "<TITLE>SeqCov: $locus</TITLE>\n";
+	print "</HEAD>\n";
+	print "<body>\n";# background=\"http://squatch.scripps.edu/images/marble.jpg\" ALIGN=\"CENTER\">\n";
+	print "<table border>\n";# ALIGN=\"CENTER\">\n";
+	print "<TR><TD><B><font color=\"red\">$locuscomplete</font></B></TD>\n";
+	print "<TR><TD>Residues: $residueno</TD>\n";
+# was the coverage data truncated?
+	if ($truncalarm > 0) {
+		print "<TR><TD><B><font color=\"red\">Careful: coverage data was truncated due to CGI character limitations!</font></B></TD>\n";
+	}
+# print alignments + bells and whistles ...
+	print "<TR><TD><pre>\n\n";
+	for $c (0 .. $#alignstringformated) {
+		$increment = $c * $piecelength;
+		$printincrement = $increment + 1;
+		if ($completeno < 100){
+			if ($increment < 10) {
+				print "      $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "        $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			else {
+				print "     $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "        $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+		print "\n";
+		}
+		elsif ($completeno < 1000){
+			if ($increment < 10) {
+				print "       $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "         $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			elsif ($increment < 100 && $increment >= 10) {
+				print "      $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "         $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			else {
+				print "     $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "         $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+		print "\n";
+		}
+		else {
+			if ($increment < 10) {
+				print "        $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "          $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			elsif ($increment < 100 && $increment >= 10) {
+				print "       $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "          $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			elsif ($increment < 1000 && $increment >= 100) {
+				print "      $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "          $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+			else {
+				print "     $printincrement $alignstringformated[$c]     \n";
+				for $d (0 .. $#outputsformated) {
+					if (exists($outputsformated[$d][$c]) && $outputsformated[$d][$c] =~ /-/) {
+						print "          $outputsformated[$d][$c]     \n";
+					}
+				}
+			}
+		print "\n";
+		}
+	}
+print "\n</pre></td>\n";     
+print "</table>\n";
+print "</body>\n";
+print "<html>\n";
+exit;
+#
+# Version 0.5, 04/23/2002
+# - proper handling of html-encoding ($input =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;)
+# - proper dealing with "|" containing strings (if ($dbline =~ /^>\Q$locus\E[\s]/ || /^>\Q$locus\E/) {)
+#
+# Version 0.4, 03/25/2002
+# - fixed locus recognition in database: to "$locus[\s*]";
+#
+# Version 0.3, 03/22/2002
+# - script now more robust towards trailing spaces and other weiredness in databases
+#   ($alignstring =~ s/[^\w\*]//g;);
+#
+# Version 0.2, 02/17/2002
+# - sequence is now being displayed in blocks of 10 residues;
+# - "<HEAD><TITLE>" changed to "SeqCov: $locus";
+# - output now in table form;
+# - R/K residues now colored;
+#
+# Version 0.1, 02/13/2002
+# - basic bar positioning mechanism in place;
+# - output formating needs to be discussed with Dave;

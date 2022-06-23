@@ -1,0 +1,10 @@
+Start sortFastaByPrefex
+finished sortFastaByPrefex. time used: 29071
+Number of suffix proteins: 285
+Number of prefix proteins: 868
+Number of proteins after suffixe: 4
+Number of proteins in the database contains the peptide VDAASSNGPFQPV is 4
+sp|Q60996-2|2A5G_MOUSE containis VDAASSNGPFQPV at 12
+sp|Q60996-4|2A5G_MOUSE containis VDAASSNGPFQPV at 12
+sp|Q60996-3|2A5G_MOUSE containis VDAASSNGPFQPV at 12
+sp|Q60996|2A5G_MOUSE containis VDAASSNGPFQPV at 12

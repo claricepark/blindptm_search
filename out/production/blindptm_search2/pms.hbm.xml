@@ -1,0 +1,407 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+	<!--"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd"-->
+<!-- Note.  There is a bug in code generation tool of Hibernate.  java.sql.Date, java.sql.Timestamp, etc
+will be converted into java.util.Date, which causes errors.  Persistant classes needs to be manually fixed... :(
+Robin.  01/21/2005  -->
+
+<hibernate-mapping>
+   <class name="edu.scripps.pms.models.db.Users" table="users" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="firstName" column="first_name" type="java.lang.String" />
+	<property name="lastName" column="last_name" type="java.lang.String" />
+	<property name="middleName" column="middle_name" type="java.lang.String" />
+	<property name="userName" column="user_name" type="java.lang.String" />
+	<property name="researchGroupId" column="research_group_id" type="java.lang.String"/>
+	<property name="pmsUserRoleId" column="pms_user_role_id" type="java.lang.String"/>
+	<property name="dataPath" column="data_path" type="java.lang.String"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ProteinDb" table="protein_db" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="fileName" column="file_name" type="java.lang.String" />
+	<property name="organismId" column="organism_id" type="java.lang.String"/>
+	<property name="releaseDate" column="release_date" type="java.sql.Date" />
+	<property name="path" column="path" type="java.lang.String"/>
+	<property name="description" column="description" type="java.lang.String"/>
+	<property name="userId" column="users_id" type="java.lang.String"/>
+	<property name="inputDate" column="input_date" type="java.sql.Timestamp"/>
+
+	<many-to-one name="dbSource" column="db_source_id" class="edu.scripps.pms.models.db.DbSource"/>
+	<many-to-one name="organism" column="organism_id" class="edu.scripps.pms.models.db.Organism" insert="false" update="false"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Protein" table="protein" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="accession" column="accession" type="java.lang.String" />
+	<property name="version" column="version" type="java.lang.String" />
+	<property name="description" column="description" type="java.lang.String" />
+	<property name="sequence" column="sequence" type="java.lang.String" />
+	<!--property name="organism" column="organism" type="java.lang.String"/-->
+	<property name="predictedPi" column="predicted_pi" type="java.lang.String"/>
+	<property name="predictedMass" column="predicted_mass" type="java.lang.String"/>
+	<property name="geneName" column="gene_name" type="java.lang.String"/>
+	<property name="synonyms" column="synonyms" type="java.lang.String"/>
+	<property name="proteinDbId" column="protein_db_id" type="java.lang.String"/>
+
+	<many-to-one name="proteinDb" column="protein_db_id" class="edu.scripps.pms.models.db.ProteinDb" insert="false" update="false"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DbSource" table="db_source" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="source" column="source" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Organism" table="organism" >
+      <id name="id" column="id" type="string">
+	 <generator class="native"/>
+      </id>
+	<property name="name" column="name" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.PeakList" table="peak_list" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="dataSourceId" column="data_source_id" type="java.lang.String" />
+        <property name="listType" column="list_type" type="java.lang.String" />
+        <property name="loscan" column="loscan" type="java.lang.String" />
+        <property name="spectrum" column="spectrum" type="java.lang.String" />
+        <property name="mtoz" column="m_to_z" type="java.lang.String" />
+
+	<set name="msmsfractions" inverse="true" lazy="true">
+        	<key column="peak_list_id"/>
+        	<one-to-many class="edu.scripps.pms.models.db.Msmsfraction"/>
+    	</set>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DataSource" table="data_source" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="mspExperimentId" column="msp_experiment_id" type="java.lang.String" />
+        <property name="userId" column="users_id" type="java.lang.String" />
+        <property name="rowFileName" column="row_file_name" type="java.lang.String" />
+        <property name="extractedFileName" column="extracted_file_name" type="java.lang.String" />
+        <property name="extractor" column="extractor" type="java.lang.String" />
+        <property name="extractorVersion" column="extractor_version" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DbSearch" table="db_search" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="mspExperimentId" column="msp_experiment_id" type="java.lang.String" />
+        <property name="dbSearchParametersId" column="db_search_parameters_id" type="java.lang.String" />
+        <property name="userId" column="user_id" type="java.lang.String" />
+        <property name="idDate" column="id_date" type="java.sql.Date" />
+        <property name="resultPath" column="result_path" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.PeptideHitHasProtein" table="peptide_hit_has_protein" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="proteinId" column="protein_id" type="java.lang.String" />
+        <property name="peptideHitId" column="peptide_hit_id" type="java.lang.String" />
+   </class>
+
+   <!--class name="edu.scripps.pms.models.db.ProteinHitHasPeptideHit" table="protein_hit_has_peptide_hit" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="proteinHitId" column="protein_hit_id" type="java.lang.String" />
+        <property name="peptideHitId" column="peptide_hit_id" type="java.lang.String" />
+   </class-->
+
+   <class name="edu.scripps.pms.models.db.ResultSelection" table="result_selection" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="criteria" column="criteria" type="java.lang.String" />
+        <property name="resultSummary" column="result_summary" type="java.lang.String" />
+        <property name="numRedundantProteins" column="num_redundant_proteins" type="java.lang.String" />
+        <property name="numNonredundantProteins" column="num_nonredundant_proteins" type="java.lang.String" />
+        <!--property name="dbSearchId" column="db_search_id" type="java.lang.String" /-->
+	<many-to-one name="dbSearchId" column="db_search_id" class="edu.scripps.pms.models.db.DbSearch"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DbSearchParameters" table="db_search_parameters" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="parameters" column="parameters" type="java.lang.String" />
+        <property name="proteinDbId" column="protein_db_id" type="java.lang.String" />
+        <property name="programId" column="program_id" type="java.lang.String" />
+        <property name="parametersFile" column="parameters_file" type="java.lang.String" />
+        <property name="peptideMassTolerance" column="peptide_mass_tolerance" type="java.lang.String" />
+        <property name="fragmentIonTolerance" column="fragment_ion_tolerance" type="java.lang.String" />
+        <property name="maxMissedCleavages" column="max_missed_cleavages" type="java.lang.String" />
+        <property name="massTypeParent" column="mass_type_parent" type="java.lang.String" />
+        <property name="massTypeFragment" column="mass_type_fragment" type="java.lang.String" />
+        <property name="enzymeNumber" column="enzyme_number" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DbSearchParametersHasProteinDb" table="db_search_parameters_has_protein_db" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="dbSearchParametersId" column="db_search_parameters_id" type="java.lang.String" />
+        <property name="proteinDbId" column="protein_db_id" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.PeptideHit" table="peptide_hit" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="msmsfractionId" column="msmsfraction_id" type="java.lang.String" />
+        <property name="scoreTypeId" column="score_type_id" type="java.lang.String" />
+        <property name="dbSearchId" column="db_search_id" type="java.lang.String" />
+        <property name="sequence" column="sequence" type="java.lang.String" />
+        <property name="predictedMass" column="predicted_mass" type="java.lang.String" />
+        <property name="primaryScore" column="primary_score" type="java.lang.String" />
+        <property name="primaryRank" column="primary_rank" type="java.lang.String" />
+        <property name="deltaCn" column="delta_cn" type="java.lang.String" />
+
+        <set name="ptmList" lazy="false">
+           <key column="peptide_hit_id"/>
+           <one-to-many class="edu.scripps.pms.models.db.Ptm" />
+        </set>
+        
+        <many-to-one name="msmsFraction" column="msmsfraction_id" class="edu.scripps.pms.models.db.Msmsfraction" insert="false" update="false" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.IonSource" table="ion_source" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="ionSourceType" column="ion_source_type" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Msmsfraction" table="msmsfraction" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="peakListId" column="peak_list_id" type="java.lang.String" />
+        <property name="mtoz" column="m_to_z" type="java.lang.String" />
+        <property name="chargeState" column="charge_state" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.InstrumentType" table="instrument_type" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="instrumentType" column="instrument_type" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.SeparationType" table="separation_type" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="separationType" column="separation_type" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Project" table="project" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="name" column="name" type="java.lang.String" />
+        <property name="description" column="description" type="java.lang.String" />
+
+        <set name="mspExperiment" lazy="false">
+           <key column="project_id"/>
+           <one-to-many class="edu.scripps.pms.models.db.MspExperiment" />
+       </set>
+
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ProjectHasUsers" table="project_has_users" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="projectId" column="project_id" type="java.lang.String" />
+        <property name="userId" column="users_id" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Sample" table="sample" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="sampleName" column="sample_name" type="java.lang.String" />
+        <property name="sampleType" column="sample_type" type="java.lang.String" />
+        <property name="donorId" column="donor_id" type="java.lang.String" />
+        <property name="donorGender" column="donor_gender" type="java.lang.String" />
+        <property name="collaborator" column="collaborator" type="java.lang.String" />
+        <property name="description" column="description" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.SampleHasOrganism" table="sample_has_organism" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="sampleId" column="sample_id" type="java.lang.String" />
+        <property name="organismId" column="organism_id" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.MassSpecInstrument" table="mass_spec_instrument" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="description" column="description" type="java.lang.String" />
+
+	<many-to-one name="instrumentTypeId" column="instrument_type_id" class="edu.scripps.pms.models.db.InstrumentType"/>
+	<many-to-one name="ionSourceId" column="ion_source_id" class="edu.scripps.pms.models.db.IonSource"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.SamplePreparation" table="sample_preparation" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="protocol" column="protocol" type="java.lang.String" />
+	<many-to-one name="separationTypeId" column="separation_type_id" class="edu.scripps.pms.models.db.SeparationType"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ProteinHit" table="protein_hit" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="resultSelectionId" column="result_selection_id" type="java.lang.String" />
+        <!--property name="proteinId" column="protein_id" type="java.lang.String" /-->
+        <property name="numProteins" column="num_proteins" type="java.lang.String" />
+        <property name="numPeptideHit" column="sequence_count" type="java.lang.String" />
+
+	<!--list name="identifiedProteins" order-by="sequence_coverage desc" inverse="true" lazy="true"-->
+	<!--list name="identifiedProteins">
+        	<key column="protein_hit_id"/>
+            	<list-index column="sequence_coverage" base="1"/>
+        	<one-to-many class="edu.scripps.pms.models.db.ProteinHitIdentifiedProtein"/>
+    	</list-->
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ProteinHitIdentifiedProtein" table="protein_hit_identified_protein" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <!--property name="proteinId" column="protein_id" type="java.lang.String" /-->
+        <property name="proteinHitId" column="protein_hit_id" type="java.lang.String" />
+        <property name="sequenceCoverage" column="sequence_coverage" type="java.lang.String" />
+        <property name="evaluationState" column="evaluation_state" type="java.lang.String" />
+        <property name="confidence" column="confidence" type="java.lang.String" />
+
+	<many-to-one name="proteinId" column="protein_id" class="edu.scripps.pms.models.db.Protein"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ProteinHitList" lazy="true">
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="name" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.MspExperiment" table="msp_experiment" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="description" column="description" type="java.lang.String" />
+        <property name="startDate" column="start_date" type="java.sql.Date" />
+
+	<many-to-one name="projectId" column="project_id" class="edu.scripps.pms.models.db.Project"/>
+        <many-to-one name="usersId" column="users_id" class="edu.scripps.pms.models.db.Users" />
+        <many-to-one name="sampleId" column="sample_id" class="edu.scripps.pms.models.db.Sample" />
+        <many-to-one name="massSpecInstrumentId" column="mass_spec_instrument_id" class="edu.scripps.pms.models.db.MassSpecInstrument" />
+        <many-to-one name="samplePreparationId" column="sample_preparation_id" class="edu.scripps.pms.models.db.SamplePreparation" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DTASelectBestPeptide" table="dtaselect_best_peptide" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="peptideHitId" column="peptide_hit_id" type="java.lang.String" />
+        <property name="proteinHitId" column="protein_hit_id" type="java.lang.String" />
+        <property name="spectraCount" column="spectra_count" type="java.lang.String" />
+        <property name="isUnique" column="is_unique" type="java.lang.Boolean" />
+        <property name="confidence" column="confidence" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Ptm" table="ptm" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="position" column="position" type="java.lang.Integer" />
+	<property name="peptideHitId" column="peptide_hit_id" type="java.lang.String"/>
+	<property name="modificationTypeId" column="modification_type_id" type="java.lang.String"/>
+
+	<many-to-one name="modificationType" column="modification_type_id" class="edu.scripps.pms.models.db.ModificationType" insert="false" update="false"/>
+	<many-to-one name="peptideHit" column="peptide_hit_id" class="edu.scripps.pms.models.db.PeptideHit" insert="false" update="false"/>
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ModificationType" table="modification_type" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="modificationType" column="modification_type" type="java.lang.String" />
+        <property name="structure" column="structure" type="java.lang.String" />
+        <property name="massShift" column="mass_shift" type="java.lang.String" />
+        <property name="description" column="description" type="java.lang.String" />
+        <property name="modifiedResidue" column="modified_residue" type="java.lang.Character" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Publications" table="publications" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="title" column="title" type="java.lang.String" />
+        <property name="path" column="path" type="java.lang.String" />
+        <property name="docType" column="doc_type" type="java.lang.String" />
+        <property name="usersId" column="users_id" type="java.lang.String" />
+        <property name="publicationDate" column="publication_date" type="java.sql.Date" />
+        <property name="inputDate" column="input_date" type="java.sql.Timestamp" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.ScriptsRepository" table="scripts_repository" >
+      <id name="id" column="sr_id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="title" column="title" type="java.lang.String" />
+        <property name="command" column="command" type="java.lang.String" />
+        <property name="description" column="description" type="java.lang.String" />
+        <property name="inputDate" column="input_date" type="java.sql.Timestamp" />
+        <property name="filename" column="filename" type="java.lang.String" />
+        <property name="filePath" column="file_path" type="java.lang.String" />
+        <property name="usersId" column="users_id" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.DownloadUsers" table="download_users" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="firstName" column="first_name" type="java.lang.String" />
+        <property name="middleName" column="middle_name" type="java.lang.String" />
+        <property name="lastName" column="last_name" type="java.lang.String" />
+        <property name="organization" column="organization" type="java.lang.String" />
+        <property name="email" column="email" type="java.lang.String" />
+        <property name="inputDate" column="input_date" type="java.sql.Timestamp" />
+        <property name="softwareId" column="software_id" type="java.lang.String" />
+        <property name="downloadKey" column="download_key" type="java.lang.String" />
+        <property name="ipAddress" column="ip_address" type="java.lang.String" />
+   </class>
+
+   <class name="edu.scripps.pms.models.db.Software" table="software" >
+      <id name="id" column="id" type="string">
+         <generator class="native"/>
+      </id>
+        <property name="name" column="name" type="java.lang.String" />
+        <property name="filename" column="filename" type="java.lang.String" />
+   </class>
+</hibernate-mapping>

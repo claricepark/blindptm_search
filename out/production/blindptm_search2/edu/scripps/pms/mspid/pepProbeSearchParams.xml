@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<!--  Parameters for PepProbe Seach, modified from search.params for pep_probe  --> 
+    <parameters>
+        <database_name>/scratch/yates/ncbi/nr051803.fasta</database_name>
+        <search_mode>
+            <!--ADDITIONAL_ESTIMATE 
+                0 - default Poisson's probability
+                1 - maximum likelyhood
+                2 - entropy estimate
+                3 - XCORRR
+                31 - XCORR and Sort by XCORR
+                41 - ET normalization and sorted by ET
+                51 - EE normalization and sorted by EE
+                6 - Central Limiting Theorem
+            -->
+            <additional_estimate>0</additional_estimate>
+
+            <!--CONFIDENCE
+                0 - Chebyshev estimate
+                1 - P_V statistics
+            -->
+            <confidence>1</confidence>
+
+            <!--MIN_MATCH -->
+            <min_match>0</min_match>
+
+
+            <!-- PREPROCESS 
+                 0 - no preprocessing of spectrum, default
+                 1 - do XCorr-like preprocessing
+                 2 - do TOPDOWN preprocessing
+            --> 
+            <preprocess>1</preprocess>
+        </search_mode>
+
+        <isotopes>
+            <!--ISOTOPES
+                0 - precursor and fragment masses average(default)
+                1 - precursor monoisotopic , fragment avg
+                2 - precursor avg, fragment monoisotopic
+                3 - precursor and fragment masses monoisotopic
+            -->
+            <precursor>avg</precursor>
+            <fragment>mono</fragment>
+        </isotopes>
+        <tolerance>
+            <!--PRECURSOR_MASS_TOLERANCE-->
+            <precursor>3.0</precursor>
+            <!--FRAGMENT_ION_MASS_ACCURACY-->
+            <fragment>0.4</fragment>
+        </tolerance>
+        <precursor_mass_limits>
+            <!--MIN_PMASS-->
+            <minimum>600.00</minimum>
+            <!--MAX_PMASS-->
+            <maximum>3500.00</maximum>
+        </precursor_mass_limits>
+        <num_spectra_limits>
+            <!--MIN_LMZ-->
+            <minimum>15</minimum>
+            <!--MAX_LMZ-->
+            <maximum>5000</maximum>
+        </num_spectra_limits>
+        <max_alter>4</max_alter>
+        <modifications>
+           <modification>
+               <residue>C</residue>
+               <!--static modification applies to every occurence-->
+               <static_modification>57.00</static_modification>
+               <!--
+               <differential_modifications>
+                   <massChange>20.00</massChange>
+                   <massChange>35.00</massChange>
+               </differential_modifications>
+               -->
+           </modification>
+        </modifications>
+    </parameters>

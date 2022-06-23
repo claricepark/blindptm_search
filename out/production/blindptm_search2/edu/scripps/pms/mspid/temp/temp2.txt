@@ -1,0 +1,37 @@
+Maximum number of internal mis : -1
+maxInternalMisCleavage value is now: -1
+Total memory	204996608
+Memory used after loading the database	110409968
+Host name jaina
+Total Memory after loading the search engine	204996608	Free memory	92127600
+Memory used after loading the search engine	112869008
+TotalNumSpectra	23
+NumSearched	0	23
+NumSearched	1	23	Scan#: 63811	NumPeaks: 15	
+NumSearched	2	23	Scan#: 63813	NumPeaks: 144	FNumPeaks: 143	+2	NumPeaks: 144	M+H+: 1646.8934326171875	ptrue: 0.09443713251357172
+NumSearched	3	23	Scan#: 63814	NumPeaks: 132	FNumPeaks: 132	+3	NumPeaks: 132	M+H+: 2399.184326171875	ptrue: 0.06963107402446551
+NumSearched	4	23	Scan#: 63815	NumPeaks: 5	
+NumSearched	5	23	Scan#: 63817	NumPeaks: 119	FNumPeaks: 119	+2	NumPeaks: 119	M+H+: 1619.802490234375	ptrue: 0.10036296865301185
+NumSearched	6	23	Scan#: 63818	NumPeaks: 49	FNumPeaks: 49	+2	NumPeaks: 49	M+H+: 1388.76416015625	ptrue: 0.048121514062329486
+NumSearched	7	23	Scan#: 63819	NumPeaks: 23	
+NumSearched	8	23	Scan#: 63820	NumPeaks: 11	
+NumSearched	9	23	Scan#: 63821	NumPeaks: 9	
+NumSearched	10	23	Scan#: 63822	NumPeaks: 22	
+NumSearched	11	23	Scan#: 63823	NumPeaks: 15	
+NumSearched	12	23	Scan#: 63825	NumPeaks: 11	
+NumSearched	13	23	Scan#: 63826	NumPeaks: 15	
+NumSearched	14	23	Scan#: 63827	NumPeaks: 16	
+NumSearched	15	23	Scan#: 63828	NumPeaks: 12	
+NumSearched	16	23	Scan#: 63829	NumPeaks: 15	
+NumSearched	17	23	Scan#: 63830	NumPeaks: 10	
+NumSearched	18	23	Scan#: 63831	NumPeaks: 276	FNumPeaks: 200	+3	NumPeaks: 276	M+H+: 2537.183349609375	ptrue: 0.1551477050834102
+NumSearched	19	23	Scan#: 63832	NumPeaks: 46	FNumPeaks: 46	+3	NumPeaks: 46	M+H+: 2226.138671875	ptrue: 0.041231495637544746
+NumSearched	20	23	Scan#: 63833	NumPeaks: 12	
+NumSearched	21	23	Scan#: 63834	NumPeaks: 51	FNumPeaks: 51	+3	NumPeaks: 51	M+H+: 2214.0966796875	ptrue: 0.05096137659401824
+NumSearched	22	23	Scan#: 63835	NumPeaks: 109	FNumPeaks: 109	+4	NumPeaks: 109	M+H+: 3845.804443359375	ptrue: 0.09910480838549582
+NumSearched	23	23	Scan#: 63836	NumPeaks: 16	
+Total Memory after the search	344195072	Free memory	208681488
+Memory used after the search	135513584
+NumSpectraSearched: 8	 numSpectraIgnored: 15	totalNumSpectra: 23
+Time used for search: 30603
+

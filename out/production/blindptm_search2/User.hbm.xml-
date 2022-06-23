@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping SYSTEM "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+<hibernate-mapping>
+    <class name="edu.scripps.pms.webfw.db.pojo.User" table="user">
+        <id name="userId" column="user_id" type="java.lang.Long" unsaved-value="0">
+            <generator class="increment"/>
+        </id>
+      <property name="userName" column="user_name" type="java.lang.String" />
+    </class>
+</hibernate-mapping>

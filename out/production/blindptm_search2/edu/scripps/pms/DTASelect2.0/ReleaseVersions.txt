@@ -1,0 +1,14 @@
+DTASelect1.9: original version
+	- changes: N/A
+	- comments: N/A
+	- deployment date: 05/2003 to 09/2004
+
+DTASelect1.9.1:
+        - changes: spectral count option in Contrast, OUT bug fixed
+        - comments: N/A
+        - deployment date: 09/2004 to 02/2005
+
+DTASelect1.9.5:
+	- changes: everything from DTASelect1.9.2 up to DTASelect1.9.5
+	- comments: N/A
+	- deployment date: not deployed

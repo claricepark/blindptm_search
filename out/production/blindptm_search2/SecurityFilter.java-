@@ -1,0 +1,61 @@
+public class SecurityFilter implements Filter {
+	
+	public void init(FilterConfig config) throws ServletException {
+		Policy orgPolicy = Policy.getPolicy();
+
+		if (orgPolicy instanceof CustomPolicy) {
+			// we already did this once upon a time..
+			System.out.println("Policy is a CustomPolicy,we already did this once upon a time");
+		} else {
+			Policy.setPolicy(new CustomPolicy(orgPolicy));
+			System.out.println("Policy is not a CustomPolicy");
+		}
+	}
+	
+	public void destroy() {
+		//config = null;
+	}
+	
+	public void doFilter(ServletRequest sreq, ServletResponse sres,
+						 FilterChain chain) throws IOException, ServletException {
+		System.out.println("Starting SecurityFilter.doFilter");
+		
+		HttpServletResponse response = (HttpServletResponse)sres;
+		HttpServletRequest request = (HttpServletRequest)sreq;
+		
+		HttpSession session = request.getSession(true);
+		Subject subject = (Subject)session.getAttribute("javax.security.auth.subject");
+		
+		if (subject == null) {
+			subject = new Subject();
+		}
+		
+		session.setAttribute("javax.security.auth.subject", subject);
+		
+		LoginContext lc = null;
+		try {
+			lc = new LoginContext("Jaas", subject, new HttpAuthCallbackHandler(request));
+			System.out.println("established new logincontext");
+		} catch (LoginException le) {
+			le.printStackTrace();
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, request.getRequestURI());
+			return;
+		} 
+
+		try {
+			lc.login();
+			// if we return with no exception, authentication succeeded
+		} catch (Exception e) {
+			System.out.println("Login failed: " + e);
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, request.getRequestURI());
+			return;
+		}
+		
+		try {
+			System.out.println("Subject is " + lc.getSubject());
+			chain.doFilter(request, response);
+		} catch(SecurityException se) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, request.getRequestURI());
+		}
+	}
+}

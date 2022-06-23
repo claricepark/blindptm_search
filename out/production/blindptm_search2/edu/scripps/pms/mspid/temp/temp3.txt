@@ -1,0 +1,60 @@
+Maximum number of internal mis : -1
+maxInternalMisCleavage value is now: -1
+Total memory	130416640
+Memory used after loading the database	90208856
+Host name jaina
+Total Memory after loading the search engine	130416640	Free memory	38382264
+Memory used after loading the search engine	92034376
+TotalNumSpectra	23
+NumSearched	0	23
+With HCD processing, number of peaks before: 15 and after: 0
+With HCD processing, number of peaks before: 144 and after: 36
+With HCD processing, number of peaks before: 132 and after: 0
+With HCD processing, number of peaks before: 5 and after: 5
+With HCD processing, number of peaks before: 119 and after: 36
+With HCD processing, number of peaks before: 49 and after: 0
+With HCD processing, number of peaks before: 23 and after: 0
+With HCD processing, number of peaks before: 11 and after: 0
+With HCD processing, number of peaks before: 9 and after: 9
+With HCD processing, number of peaks before: 22 and after: 0
+With HCD processing, number of peaks before: 15 and after: 0
+With HCD processing, number of peaks before: 11 and after: 0
+With HCD processing, number of peaks before: 15 and after: 0
+With HCD processing, number of peaks before: 16 and after: 0
+With HCD processing, number of peaks before: 12 and after: 0
+With HCD processing, number of peaks before: 15 and after: 0
+With HCD processing, number of peaks before: 10 and after: 0
+With HCD processing, number of peaks before: 276 and after: 90
+With HCD processing, number of peaks before: 46 and after: 0
+With HCD processing, number of peaks before: 12 and after: 0
+NumSearched	1	23	Scan#: 63811	
+NumSearched	2	23	Scan#: 63813	FNumPeaks: 36	+2	NumPeaks: 36	M+H+: 1646.8934326171875	ptrue: 0.22738753979722506
+NumSearched	3	23	Scan#: 63814	
+NumSearched	4	23	Scan#: 63815	
+NumSearched	5	23	Scan#: 63817	FNumPeaks: 36	+2	NumPeaks: 36	M+H+: 1619.802490234375	ptrue: 0.2144961335460906
+NumSearched	6	23	Scan#: 63818	
+NumSearched	7	23	Scan#: 63819	
+NumSearched	8	23	Scan#: 63820	
+NumSearched	9	23	Scan#: 63821	
+NumSearched	10	23	Scan#: 63822	
+NumSearched	11	23	Scan#: 63823	
+NumSearched	12	23	Scan#: 63825	
+NumSearched	13	23	Scan#: 63826	
+NumSearched	14	23	Scan#: 63827	
+NumSearched	15	23	Scan#: 63828	
+NumSearched	16	23	Scan#: 63829	
+NumSearched	17	23	Scan#: 63830	
+NumSearched	18	23	Scan#: 63831	FNumPeaks: 90	+3	NumPeaks: 90	M+H+: 2537.183349609375	ptrue: 0.17120437283077078
+NumSearched	19	23	Scan#: 63832	
+NumSearched	20	23	Scan#: 63833	With HCD processing, number of peaks before: 51 and after: 0
+With HCD processing, number of peaks before: 109 and after: 0
+With HCD processing, number of peaks before: 16 and after: 0
+
+NumSearched	21	23	Scan#: 63834	
+NumSearched	22	23	Scan#: 63835	
+NumSearched	23	23	Scan#: 63836	
+Total Memory after the search	226295808	Free memory	92139872
+Memory used after the search	134155936
+NumSpectraSearched: 3	 numSpectraIgnored: 20	totalNumSpectra: 23
+Time used for search: 17389
+

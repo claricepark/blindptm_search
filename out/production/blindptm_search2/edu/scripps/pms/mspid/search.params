@@ -1,0 +1,86 @@
+#database_name = G:\5\dbase\nci\NRP.fasta
+#database_name = yeast_orfs
+#database_name = G:\5\dbase\nci\yeast_orfs
+#database_name = yeast_short
+#database_name = yeast_orfs
+#database_name = /wfs/dbase/ncbi/nr051803.fasta
+#database_name = /wfs/dbase/nci/yeastorf4.fasta
+#database_name = /wfs/bfd/5/rovshan/programs/java/threads2/pep_probe/yeast
+#database_name = /wfs/bfd/1/hongbin/dbase/yeast/human_yeast
+#database_name = /wfs/bfd/8/wenhong/dbase/final_SO.txt
+#database_name = /wfs/dbase/p_falciparum/PfOrfs_081202_HMR.fasta
+#database_name = /wfs/bfd/6/johnv/HMR.fasta
+#database_name = /wfs/dbase/refseq/lenS.fasta.nr
+#database_name = /wfs/dbase/p_falciparum/hsmouserat_82002__wLaminProt_wNewCont.fasta
+#database_name = /wfs/dbase/c_elegans/wormpep80.hongbin
+#database_name = /wfs/dbase/p_falciparum/Py_5x_GM_total_HMR.fasta
+#DATABASE_NAME = /wfs/dbase/ncbi/nr031004.fasta
+#DATABASE_NAME = /wfs/bfd/6/johnv/HMR.fasta
+####DATABASE_NAME = /scratch/yates/nci/yeast032604.fasta
+#DATABASE_NAME = /scratch/yates/nci/ipi_human_050204.fasta
+DATABASE_NAME = /scratch/yates/ncbi/nr051803.fasta
+#DATABASE_NAME = /wfs/dbase/nci/yeast_human.james
+#database_name = /wfs/bfd/5/rovshan/programs/java/threads2/pep_probe/intens/test_central/fibrino/HMR/HMR.fasta
+#database_name = single.yeast
+#database_name = /wfs/dbase/nci/wormpep79.fasta
+#database_name = /wfs/dbase/nci/NRP.fasta
+ADDITIONAL_ESTIMATE = 6               ; 0 - default Poisson's probability,
+                                         1 - maximum likelyhood estimate
+                                         2 - entropy estimate - not implemented yet
+                                         3 - XCORRR
+                                         31 - XCORR and sort by XCORR
+                                         41 - ET normalization and sorted by ET
+                                         51 - EE normalization and sorted by EE
+                                         6 - Central Limiting Theorem
+CONFIDENCE = 1                         ; 0 - Chebyshev estimate
+                                         1 - P_v statistics
+MIN_MATCH = 0
+ISOTOPES = 2                           ; 0 - precursor and fragment masses average (default),
+                                       ; 1 - precursor mass monoisotopic,
+                                         fragment mass average
+                                       ; 2 - precursor mass average,
+                                         fragment mass monoisotopic
+                                       ; 3 - precursor and fragment masses monoisotopic
+PREPROCESS = 1                         ; 0 - no preprocessing of spectrum, default
+                                       ; 1 - do XCorr-like preprocessing
+                                       ; 2 - do TOPDOWN preprocessing
+MIN_PMASS = 600.0                       ; mininum precursor mass to do a search, default is 600.0
+MAX_PMASS = 3500.0                      ; maximum precursor mass to do a search, default is 3500.0
+MIN_LMZ = 15                          ; minimum number of m/z values in spectrum, default is 15
+MAX_LMZ = 5000                        ; maximum number of m/z values in spectrum, default is 5000
+#ALTERNATE_AAS =  M 16.0 * S 80.0 $  K 40.0 &             ; This line needs to come after ISOTOPES line,
+#ALTERNATE_AAS =  M 16.0 *               ; This line needs to come after ISOTOPES line,
+                                                         
+MAX_ALTER = 4
+PRECURSOR_MASS_TOLERANCE = 3.0
+FRAGMENT_ION_MASS_ACCURACY_LEFT = 4    ; accuracy of fragment ion mass calculations. The value
+                                         is the number of time tenth of dalton (4 means -0.4 
+                                         8 -0.8, 10 -1.0)
+FRAGMENT_ION_MASS_ACCURACY_RIGHT = 4  ; accuracy of fragment ion mass calculations. The value
+                                         is the number of time tenth of dalton (4 means +0.4 
+                                         8  +0.8, 10  +1.0)
+READ_DATABASE_INTOMEMORY = NO         ; NO - is the default.
+add_G_Glycine = 0.0000                 ; added to G - avg.  57.0519, mono.  57.02146
+add_A_Alanine = 0.0000                 ; added to A - avg.  71.0788, mono.  71.03711
+add_S_Serine = 0.0000                  ; added to S - avg.  87.0782, mono.  87.02303
+add_P_Proline = 0.0000                 ; added to P - avg.  97.1167, mono.  97.05276
+add_V_Valine = 0.0000                  ; added to V - avg.  99.1326, mono.  99.06841
+add_T_Threonine = 0.0000               ; added to T - avg. 101.1051, mono. 101.04768
+add_C_Cysteine = 57.000                ; added to C - avg. 103.1388, mono. 103.00919
+add_L_Leucine = 0.0000                 ; added to L - avg. 113.1594, mono. 113.08406
+add_I_Isoleucine = 0.0000              ; added to I - avg. 113.1594, mono. 113.08406
+add_X_LorI = 0.0000                    ; added to X - avg. 113.1594, mono. 113.08406
+add_N_Asparagine = 0.0000              ; added to N - avg. 114.1038, mono. 114.04293
+add_O_Ornithine = 0.0000               ; added to O - avg. 114.1472, mono  114.07931
+add_B_avg_NandD = 0.0000               ; added to B - avg. 114.5962, mono. 114.53494
+add_D_Aspartic_Acid = 0.0000           ; added to D - avg. 115.0886, mono. 115.02694
+add_Q_Glutamine = 0.0000               ; added to Q - avg. 128.1307, mono. 128.05858
+add_K_Lysine = 0.0000                  ; added to K - avg. 128.1741, mono. 128.09496
+add_Z_avg_QandE = 0.0000               ; added to Z - avg. 128.6231, mono. 128.55059
+add_E_Glutamic_Acid = 0.0000           ; added to E - avg. 129.1155, mono. 129.04259
+add_M_Methionine = 0.0000              ; added to M - avg. 131.1926, mono. 131.04049
+add_H_Histidine = 0.0000               ; added to H - avg. 137.1411, mono. 137.05891
+add_F_Phenyalanine = 0.0000            ; added to F - avg. 147.1766, mono. 147.06841
+add_R_Arginine = 0.0000                ; added to R - avg. 156.1875, mono. 156.10111
+add_Y_Tyrosine = 0.0000                ; added to Y - avg. 163.1760, mono. 163.06333
+add_W_Tryptophan = 0.0000              ; added to W - avg. 186.2132, mono. 186.07931

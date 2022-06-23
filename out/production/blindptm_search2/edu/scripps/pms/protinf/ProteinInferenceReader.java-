@@ -1,0 +1,517 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package edu.scripps.pms.protinf;
+
+import edu.scripps.pms.util.dtaselect.Protein;
+import edu.scripps.pms.util.io.DTASelectFilterReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author harshil
+ */
+public class ProteinInferenceReader 
+{
+
+    private int groupIdIndex =-1;
+    private int totalMembersIndex = -1;
+    private int occurenceIndex = -1 ;
+    private int sortingCodeIndex = -1;
+    private int forwardProeinCountindex =-1;
+    private int reverseProteinCountIndex = -1;
+    private int globalRateIndex = -1;
+    private int  confidenceIndex =-1;
+    private int peptideItemIndex = -1;
+    private int totalSpecCountIndex =-1;
+    private int sumZScoreIndex =-1;
+    private int uniquePeptideIndex = -1;
+    private int identifiedTrypticPeptideIndex =-1;
+    private int trypticPeptideIndex =-1;
+    private int proteinLengthIndex =-1;
+    private int proteinSequenceCoverageIndex =-1;
+    private int isReverseHitIndex = -1;
+    private int proteinAccessionIndex =-1;
+    private int  geneNameIndex =-1;
+    private int deflineIndex =-1;
+    private int allAccessionIndex = -1;
+    private int allDeflineIndex =-1;
+    List<Integer>  spectrumCountIndex = new ArrayList<>();
+    List<Integer> pepCountIndex = new ArrayList<>(); 
+    
+    String header = null;
+    List<String> fileList = new ArrayList<>();
+    private List<Hashtable<String, Protein>> proteinHashList = new ArrayList<Hashtable<String, Protein>>();//PRotein accession to protein
+
+        
+    private String  filePath = null;
+    
+    private BufferedReader br = null;
+    
+    public ProteinInferenceReader(String fileName) {
+        try {
+            this.filePath = fileName;
+            br = new BufferedReader(new FileReader(fileName));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ProteinInferenceReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void  readHeader(String currentLine)
+    {
+        String words[] = currentLine.split("\t");
+        for(int i =0;i<words.length ; i++)
+        {
+            if(words[i].toLowerCase().contains("protein group id"))
+            {
+                groupIdIndex = i;
+                header = currentLine;
+            }
+            else if(words[i].toLowerCase().contains("number of members"))
+                 totalMembersIndex = i;
+            else if(words[i].toLowerCase().contains("occurrence"))
+                occurenceIndex = i;
+            else if(words[i].toLowerCase().contains("sorting code"))
+                sortingCodeIndex = i;
+            else if(words[i].toLowerCase().contains("forward protein hit"))
+                forwardProeinCountindex = i;
+            else if(words[i].toLowerCase().contains("reverse protein hit"))
+                reverseProteinCountIndex = i;
+            else if(words[i].toLowerCase().contains("globle"))
+                globalRateIndex = i;
+            else if(words[i].toLowerCase().contains("confidence"))
+                confidenceIndex = i;
+            else if(words[i].toLowerCase().contains("peptideitem"))
+                peptideItemIndex = i;
+            else if(words[i].toLowerCase().contains("total spectrum"))
+                totalSpecCountIndex = i;
+            else if(words[i].toLowerCase().contains("sumzscore"))
+                sumZScoreIndex = i;
+            else if(words[i].toLowerCase().contains("unique peptide sequen"))
+                uniquePeptideIndex = i;
+            else if(words[i].toLowerCase().contains("identified tryptic peptides"))
+                identifiedTrypticPeptideIndex = i;
+            else if(words[i].toLowerCase().contains("num typtic peptides"))
+                trypticPeptideIndex = i;
+            else if(words[i].toLowerCase().contains("protein length"))
+                proteinLengthIndex = i;
+            else if(words[i].toLowerCase().contains("protein sequence coverage"))
+                proteinSequenceCoverageIndex = i;
+            else if(words[i].toLowerCase().contains("isreversehit"))
+                isReverseHitIndex = i;
+            else if(words[i].toLowerCase().contains("protein accession"))
+                proteinAccessionIndex = i;
+            else if(words[i].toLowerCase().contains("protein gene name"))
+                geneNameIndex = i;
+            else if(words[i].toLowerCase().contains("defline") && !words[i].toLowerCase().contains("all"))
+                deflineIndex = i;
+            else if(words[i].toLowerCase().contains("all accessions"))
+                allAccessionIndex = i;
+            else if(words[i].toLowerCase().contains("all deflines"))
+                allDeflineIndex = i;
+            else if(words[i].toLowerCase().contains("spectrum_count_"))
+            {
+                spectrumCountIndex.add(i);
+                fileList.add(words[i].split("Spectrum_Count_")[1]);
+            }
+            else if(words[i].toLowerCase().contains("peptide_count_"))
+                pepCountIndex.add(i);
+            
+        }
+        proteinHashList = generateSPCount();
+        
+    }
+    
+    private ProteinData getProtein(String currentLine)
+    {
+        ProteinData pData = new ProteinData();
+        String words[] = currentLine.split("\t");
+        
+        
+        if(groupIdIndex != -1)
+                    pData.setGroupId(Integer.parseInt(words[groupIdIndex]));
+
+        if(totalMembersIndex  != -1)
+                    pData.setTotalMembers(Integer.parseInt(words[totalMembersIndex]));
+
+        if(occurenceIndex   != -1)
+                    pData.setOccurence(Integer.parseInt(words[occurenceIndex]));
+
+        if(sortingCodeIndex  != -1)
+                    pData.setSortingCode(words[sortingCodeIndex]);
+
+        if(forwardProeinCountindex != -1)
+                    pData.setForwardProeinCount(Integer.parseInt(words[forwardProeinCountindex]));
+
+        if(reverseProteinCountIndex  != -1)
+                    pData.setReverdeProteinCount(Integer.parseInt(words[reverseProteinCountIndex]));
+
+        if(globalRateIndex  != -1)
+                    pData.setGlobalRate(Double.parseDouble(words[globalRateIndex]));
+
+        if( confidenceIndex != -1)
+                    pData.setConfidence(Double.parseDouble(words[confidenceIndex]));
+
+        if(peptideItemIndex  != -1)
+            pData.setPeptideItem(Integer.parseInt(words[peptideItemIndex]));
+
+        if(totalSpecCountIndex != -1)
+            pData.setTotalSpecCount(Integer.parseInt(words[totalSpecCountIndex]));
+        
+        if(sumZScoreIndex != -1)
+            pData.setSumZScore(Double.parseDouble(words[sumZScoreIndex]));
+        
+        if(uniquePeptideIndex  != -1)
+            pData.setUniquePeptide(words[uniquePeptideIndex]);
+        
+        if(identifiedTrypticPeptideIndex != -1)
+            pData.setIdentifiedTrypticPeptide(words[identifiedTrypticPeptideIndex]);
+        
+        if(trypticPeptideIndex != -1)
+            pData.setTrypticPeptide(words[trypticPeptideIndex]);
+        
+        if(proteinLengthIndex != -1)
+            pData.setProteinLength(Integer.parseInt(words[proteinLengthIndex]));
+        
+        if(proteinSequenceCoverageIndex != -1)
+            pData.setProteinSequenceCoverage(Double.parseDouble(words[proteinSequenceCoverageIndex]));
+        
+        if(isReverseHitIndex  != -1)
+            pData.setIsReverseHit(Boolean.parseBoolean(words[isReverseHitIndex]));
+        
+        if(proteinAccessionIndex != -1)
+            pData.setProteinAccession(words[proteinAccessionIndex]);
+        
+        if( geneNameIndex != -1)
+            pData.setGeneName(words[geneNameIndex]);
+        
+        if(deflineIndex != -1)
+            pData.setDefline(words[deflineIndex]);
+        
+        if(allAccessionIndex  != -1)
+            pData.setAllAccession(words[allAccessionIndex]);
+        
+        if(allDeflineIndex != -1)
+            pData.setAllDefline(words[allDeflineIndex]);
+
+        if (spectrumCountIndex.size() != 0) 
+        {
+
+            String headerWords[] = header.split("\t");
+            List<Integer> searchId = new ArrayList<>();
+	    List<String> filePath = new ArrayList<>();
+            for (int index : spectrumCountIndex) 
+            {
+//                String currentSearchId[] = headerWords[index].split("[/_]");
+//              searchId.add(Integer.parseInt(currentSearchId[currentSearchId.length - 1]));
+	 	String currentFile[] = headerWords[index].split("Spectrum_Count_");
+                filePath.add(currentFile[currentFile.length - 1]);
+
+              
+//             Uncomment this one to get the spectrum count from the protinf_proteinGroup file...        
+//                pData.addSpectrumCount(words[index]);
+            }
+            pData.setSearchIdGroup(searchId);
+	    pData.setFileList(filePath);
+        }
+
+        
+        
+        
+        
+        pData.setSpectrumCount(getSpcList(words[allAccessionIndex]));
+        pData.setNsaf(getNSAFList(words[allAccessionIndex]));
+        pData.setEmpai(getEMPAIList(words[allAccessionIndex]));
+        pData.setPepCount(getpepCountList(words[allAccessionIndex]));
+        
+        pData.setSortingCode(getSortingCode(pData.getSpectrumCount()));
+        pData.setTotalSpecCount(getTotalCount(pData.getSpectrumCount()));
+//        if(pepCountIndex.size()!=0)
+//        {
+//            for(int index : pepCountIndex)
+//                pData.addPepCount(words[index]);
+//        }
+            
+  
+        return pData;
+    }
+    
+    
+    private int getTotalCount(List<Integer> spcCount)
+    {
+        int total =0;
+        for(int value : spcCount)
+        {
+            total += value;
+        }
+        return total;
+    }
+    
+    private String getSortingCode(List<Integer> spcCount)
+    {
+        StringBuffer sortingCode = new StringBuffer();
+        for(int value : spcCount)
+        {
+            if(value == 0)
+                sortingCode.append("0_");
+            else
+                sortingCode.append("1_");
+        }
+        return sortingCode.toString();
+    }
+    private List<Integer> getpepCountList(String accessionList)
+    {
+        List<Integer> pepCountList = new ArrayList<>();
+        String accessionArr[] = accessionList.split(";");
+        for(Hashtable<String,Protein> currentHashtable: proteinHashList)
+        {
+            List<Integer> tempList = new ArrayList<>();
+            for(String accession: accessionArr)
+            {
+               if(currentHashtable.get(accession) == null)
+                    tempList.add(0);
+                else
+                    tempList.add(currentHashtable.get(accession).getNumPeptides()); 
+            }
+            pepCountList.add(Collections.max(tempList));
+        }
+        
+        return pepCountList;
+    }
+    
+//    private List<Integer> getSpcList(String accessionList)
+//    {
+//        List<Integer> spcList = new ArrayList<>();
+//            for(Hashtable<String,Protein> currentHashtable: spcHashList)
+//            {
+//    //            Integer value = Integer.parseInt();
+//                if(currentHashtable.get(accession) == null)
+//                    tempList.add(0);
+//                else
+//                    tempList.add(Integer.parseInt(currentHashtable.get(accession).getSpectrumCount()));
+//            }
+//            
+//        }
+//        return spcList;
+//    }
+    
+    private List<Integer> getSpcList(String accessionList)
+    {
+        List<Integer> spcList = new ArrayList<>();
+        String accessionArr[] = accessionList.split(";");
+//        if(accessionArr.length >1)
+//            System.out.println(accessionArr);
+        for(Hashtable<String,Protein> currentHashtable: proteinHashList)
+        {
+            List<Integer> tempList = new ArrayList<>();
+            for(String accession: accessionArr)
+            {
+//               if(accession.equals("sp|O70305|ATX2_MOUSE"))
+//                    System.out.println("");
+               if(currentHashtable.get(accession) == null)
+                    tempList.add(0);
+                else
+                    tempList.add(Integer.parseInt(currentHashtable.get(accession).getSpectrumCount())); 
+            }
+//             if(accessionArr.length >1)
+//              System.out.println(tempList + "max " + Collections.max(tempList));
+            spcList.add(Collections.max(tempList));
+        }
+        
+        return spcList;
+    }
+            
+    private List<Double> getNSAFList(String accessionList)
+    {
+        List<Double> nsafList = new ArrayList<>();
+        String accessionArr[] = accessionList.split(";");
+        for(Hashtable<String,Protein> currentHashtable: proteinHashList)
+        {
+            List<Double> tempList = new ArrayList<>();
+            for(String accession: accessionArr)
+            {
+//            Integer value = Integer.parseInt();
+                if(currentHashtable.get(accession) == null)
+                    tempList.add(0.0);
+                else if(currentHashtable.get(accession).getNsaf() == null)
+                    tempList.add(0.0);
+                else
+                    tempList.add(Double.parseDouble(currentHashtable.get(accession).getNsaf()));
+            }
+            nsafList.add(Collections.max(tempList));
+        }
+        return nsafList;
+    }
+    
+    private List<Double> getEMPAIList(String accessionList)
+    {
+        List<Double> empaiList = new ArrayList<>();
+        String accessionArr[] = accessionList.split(";");
+        
+        for(Hashtable<String,Protein> currentHashtable: proteinHashList)
+        {
+            List<Double> tempList = new ArrayList<>();
+            for(String accession: accessionArr)
+            {
+//            Integer value = Integer.parseInt();
+                if(currentHashtable.get(accession) == null)
+                    tempList.add(0.0);
+                else if(currentHashtable.get(accession).getEmpai() == null)
+                    tempList.add(0.0);
+                else
+                    tempList.add(Double.parseDouble(currentHashtable.get(accession).getEmpai()));
+            }
+            empaiList.add(Collections.max(tempList));
+        }
+        return empaiList;
+    }
+    
+    private List<Hashtable<String, Protein>> generateSPCount()
+    {
+        List<Hashtable<String, Protein>> spectrumCountList = new ArrayList();
+        
+        for(String fileName : fileList)
+        {
+            try {
+                fileName += File.separator + "DTASelect-filter.txt";
+//            dtaselect reader  read teh dtafile generate the has map of protein->speccount
+                DTASelectFilterReader dtaReader = new DTASelectFilterReader(fileName);
+                List<Protein> proteinList = dtaReader.getProteinList();
+                Hashtable<String, Protein> ht = new Hashtable<String, Protein>();// PRoteinAccessin to Protein Object
+                for(Protein currentProtein : proteinList)
+                {
+                    ht.put(currentProtein.getAccession(), currentProtein);
+                }
+                spectrumCountList.add(ht);
+                    
+            } catch (IOException ex) {
+                Logger.getLogger(ProteinInferenceReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+                 
+        }
+        return spectrumCountList;
+        
+    }
+    public List<ProteinData> getProteinList()
+    {
+        List<ProteinData> pDataList = null;
+        try {
+             pDataList = new ArrayList<>();
+            String currentLine = br.readLine();
+
+            while(currentLine!=null)
+            {
+                if(currentLine.startsWith("Protein"))
+                    readHeader(currentLine);
+                else
+                {
+                    ProteinData data = getProtein(currentLine);
+                    if(!isZeroData(data.getSortingCode()))
+                        pDataList.add(data);
+       		    else
+                        System.out.println(data.getSortingCode() + data.getProteinAccession());
+                }
+                
+                currentLine = br.readLine();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ProteinInferenceReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        generateNormSpc(pDataList);
+        return pDataList;
+    }
+    
+    private boolean isZeroData(String code)
+    {
+        String eachCode[] = code.split("_");
+        for(String currentCode : eachCode)
+        {
+            if(!currentCode.equalsIgnoreCase("0"))
+                return false;
+        }
+        return true;
+    }
+    
+    public void generateNormSpc(List<ProteinData> pDataList)
+    {
+//        List<List<Double>> nsafValueList =  new ArrayList<>();
+        List<Double> totalPvalue = new ArrayList<>();
+        double globalSum = 0;
+        for(int i =0 ;i<pDataList.get(0).getSpectrumCount().size();i++)
+            totalPvalue.add(0.0);
+        for(ProteinData currentProtein : pDataList)
+        {
+            
+            for(int i=0;i<currentProtein.getSpectrumCount().size();i++)
+            {
+//                double value = currentProtein.getSpectrumCount().get(i)/ currentProtein.getProteinLength();
+                double value =(double)currentProtein.getSpectrumCount().get(i);
+                value += totalPvalue.get(i);
+                totalPvalue.set(i, value);
+            }
+            globalSum += currentProtein.getTotalSpecCount();
+
+        }
+        
+        globalSum /=pDataList.get(0).getSpectrumCount().size();
+        
+        for(ProteinData currentProtein : pDataList)
+        {
+            List<Double> currentNsaf = new ArrayList<>();
+            List<Double> currentNormSPC = new ArrayList<>();
+            
+            for(int i=0;i<currentProtein.getSpectrumCount().size();i++)
+            {
+                double value = (double)currentProtein.getSpectrumCount().get(i)/ currentProtein.getProteinLength();
+                currentNsaf.add(value/totalPvalue.get(i));
+                value =( (double)currentProtein.getSpectrumCount().get(i) / totalPvalue.get(i)) * globalSum;
+                currentNormSPC.add(value);
+            }
+/*           
+            uncomment this line to get NSAF from the above method.......
+            currentProtein.setNsaf(currentNsaf);
+*/       
+            currentProtein.setNormSpcCount(currentNormSPC);
+           
+            
+        }
+        
+    }
+    
+    public static void main(String[] args)
+    {
+//        ProteinInferenceReader piReader = new ProteinInferenceReader("/ip2_data/claired/mireya/compare/search/idcompare5737/protinf_proteingroups.txt");
+        ProteinInferenceReader piReader = new ProteinInferenceReader("/data/2/rpark/ip2_data/rpark/Demo_Project_c_elegance/compare/search//idcompare5870//protinf_proteingroups.txt");
+        List<ProteinData> pData = piReader.getProteinList();
+	for(ProteinData data : pData)
+	{
+		if(data.getProteinAccession().equals("B0432.4"))
+		{
+			System.out.println(  data.getSpectrumCount());
+		}	
+	}
+        System.out.println("done.......");
+        
+        
+    }
+    
+    
+}
+

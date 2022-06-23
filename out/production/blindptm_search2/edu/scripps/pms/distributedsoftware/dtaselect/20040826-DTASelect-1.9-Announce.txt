@@ -1,0 +1,58 @@
+Migrating from Version 1.8
+--------------------------
+
+The "Sappho" release of DTASelect moves it to version 1.9 from version
+1.8.  The reason behind the version number change is that the
+DTASelect.txt file format has been modified, and the software needs to
+be able to know when it is using DTASelect.txt files from earlier
+versions.  If you use this release of DTASelect with pre-existing
+DTASelect.txt files, you will soon discover that Sp scores and
+calculated peptide masses will read as 0.0.  In addition, Contrast
+merge will fail.  There are two ways to deal with this.  First, you
+can move your existing DTASelect install to a different directory and
+add startup scripts for the older versions.  Secondly, you can delete
+your existing DTASelect.txt files and create them by running the new
+DTASelect.
+
+If you are migrating from an earlier DTASelect, you'll need to rewrite
+your DTASelect.ini file.  The distribution includes an example
+configuration file, so be sure to move your existing one before
+extracting DTASelect 1.9 into that directory.
+
+Acquisition and Installation of Version 1.9
+-------------------------------------------
+
+DTASelect can be downloaded at this URL:
+
+http://fields.scripps.edu/DTASelect/20040826-DTASelect-1.9.zip
+
+The password to extract the Zip file is "Sappho" (who was poet in the
+6th century BC).
+
+Installation of DTASelect 1.9 is quite similar to installing DTASelect
+1.8.  Extract the Zip file containing the Sappho release to the
+"C:\DTASelect\" directory on your hard disk.  Copy the DTASelect.bat,
+Contrast.bat, and MoreFASTA.bat files to your "C:\Windows" or
+"C:\WinNT" direcoty.  Modify the file DTASelect.ini with the
+appropriate configuration options (if you need hints on getting the
+URLs correct, examine your existing SEQUEST summary pages).
+
+Test that your computer has Java installed: open a command prompt 
+(usually Start -> All Programs -> Accessories -> MS-DOS command 
+prompt), and type "java". If a help message shows up, Java is 
+working on your computer. If you get an error message instead, 
+you first need to install Java. You can get a JRE (Java Runtime 
+Environment) at http://www.java.com.
+
+When this process is complete, you should be able to execute DTASelect
+at the command-line (or "MS-DOS Prompt") by typing "DTASelect" or
+"Contrast" and hitting enter.
+
+I'll leave the DTASelect 1.8 manual in place for folks who decide to
+stick with the existing version of the software, so be sure to
+download the new manual if that is your intent.  Good luck with the
+software, and if you have questions, the folks in the Yates Lab stand
+ready to help.
+
+David L. Tabb
+Daniel Cociorva

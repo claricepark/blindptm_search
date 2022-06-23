@@ -1,0 +1,912 @@
+package edu.scripps.pms.protinf;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.*;
+import java.io.*;
+import edu.scripps.pms.util.seq.Fasta;
+import edu.scripps.pms.util.io.FastaReader;
+import edu.scripps.pms.util.io.DTASelectFilterReader;
+import edu.scripps.pms.util.dtaselect.Peptide;
+import edu.scripps.pms.util.dtaselect.Protein;
+import edu.scripps.pms.util.spectrum.PeakList;
+import edu.scripps.pms.util.io.SpectrumReader;
+import edu.scripps.pms.util.seq.PrefixDb;
+
+/**
+ * <p>Program to six-frame translate a nucleotide sequence</p>
+ */
+
+// It now ignores frames with more than 2 stop condons
+public class ProteinInference {
+
+
+
+    // C_elegan
+    //public static final String database = "/lustre/people/applications/yates/dbase/wormbase_c-elegans_225_NoGeneDuplicates_05-10-2011_reversed.fasta";
+    public static String database = "/lustre/people/applications/yates/dbase/UniProt_mouse_05-17-2011_reversed.fasta";
+    //public static final String database = "/lustre/people/applications/yates/dbase/UniProt_Human_05-17-2011_reversed.fasta";
+    //public static final String database = "/data/2/rpark/ip2_data/taoxu/database///17PM_pombe030305.fasta";
+    //public static final String dtaselectfiles = "/data/8/taoxu_on_data8/projects/nhlbi/protinf/celegan_mitochodira.txt";
+    public static String dtaselectfiles = "/data/8/taoxu_on_data8/projects/nhlbi/protinf/MouseMitochodrialV1.txt";
+    //public static final String dtaselectfiles = "/data/8/taoxu_on_data8/projects/nhlbi/protinf/test.txt";
+    public static String outputfile = "/data/8/taoxu_on_data8/projects/nhlbi/protinf/protinf_test.txt";
+    public static int peptideScoreType = 1;
+    public static HashMap<String, Fasta> ac2Fasta = new HashMap();
+    public static String USAGE = "proteininferencer folder_list_file fasta_database [peptide_fdr]";
+
+    /**
+     * Call this to get usage info, program terminates after call.
+     */
+    public static void help() {
+	System.out.println("usage: java ProteinInference file_contains_all_the_folders output_file_name");
+	System.exit(-1);
+    }
+
+    public static int getPeptideLocation(String peptide, Fasta protein) {
+        return protein.getSequence().indexOf(peptide);
+    }
+    public static HashMap<String, Fasta> getProteinMap(String database) throws IOException {
+        HashMap<String, Fasta> ac2fasta = new HashMap(1000000);
+        FileInputStream fis = new FileInputStream(new File(database));
+        Iterator<Fasta> fastas = FastaReader.getFastas(fis);
+        while(fastas.hasNext()) {
+            Fasta f = fastas.next();
+            String myac = f.getAccession();
+   //System.out.println("protien ac " + myac + "\tdescription " + f.getDescription());
+            //if(myac != null && !myac.startsWith("Reverse")) {
+            if(myac != null) {
+                ac2fasta.put(myac, f);
+            }
+        }
+        return ac2fasta;
+    }
+
+    public static ArrayList<ProteinGroup> groupProteins(HashSet<ProteinItem>  pis) {
+//System.out.println("Number of ProteinItems before grouping " + pis.size());
+        ArrayList<ProteinGroup> pgs = new ArrayList(100000);
+        ArrayList<ProteinItem> temppis = new ArrayList();
+        temppis.addAll(pis);
+        Collections.sort(temppis);
+        int numpgs = 0;
+        int numreversepgs = 0;
+//System.out.println("GroupProtein Added\tNumReverseHit\tFDR\tNumber of PeptideItem\tsumZScore\tIsReverseHit");
+        for(int i = 0; i < temppis.size(); i++){
+            ProteinItem current = temppis.get(i);
+            if(current != null) {
+                ProteinGroup pg = new ProteinGroup();
+                numpgs++;
+                pg.addProteinItem(current);
+                if(pg.isReverseHit()) {
+                    numreversepgs++;
+                }
+//System.out.println(numpgs + "\t" + numreversepgs + "\t" + numreversepgs/(0.0 + numpgs) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getSumZScore() + "\t" + pg.isReverseHit());
+                pgs.add(pg);
+                temppis.set(i, null);
+                HashSet<PeptideItem> currentset = current.getPeptideItems();
+                for(int j = i+1; j < temppis.size(); j++) {
+                
+                    ProteinItem next = temppis.get(j);
+                    if(next != null) {
+
+                        HashSet<PeptideItem> nextset = next.getPeptideItems();
+                        if(currentset.size() == nextset.size() && currentset.containsAll(nextset)) {
+                            pg.addProteinItem(next);
+                            temppis.set(j, null);
+                        } 
+
+                    }
+                }
+            }
+        }        
+
+System.out.println("Final number of groupProtein added " + numpgs);
+        return pgs;
+    }
+
+    // the allpgs should be sorted when this function is called, scoretype 2 for sumZScore, 5 for averageZScore, 6 for confidenceSum 
+    // 7 for confidenceProduct 
+    private static void calcProteinConfidence(ArrayList<ProteinGroup> allpgs, int scoretype) {
+       
+        double [] localfdr = new double[allpgs.size()];
+        int [] globlefdr = new int[allpgs.size()];
+        boolean [] reversehits = new boolean[allpgs.size()];
+        int numreversepgs = 0;
+        int numpgs = 0;
+//System.out.println("Number of Protein Groups Added\tNumReverseHit\tFDR\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tIsReverseHit");
+        for(int i = 0; i < allpgs.size(); i++) {
+            ProteinGroup pg = allpgs.get(i);
+            numpgs++;
+            if(pg.isReverseHit()) {
+                reversehits[i] = true;
+                globlefdr[i] = ++numreversepgs;
+                
+            }
+//System.out.println(numpgs + "\t" + numreversepgs + "\t" + numreversepgs/(0.0 + numpgs) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.isReverseHit());
+        }
+        int numcloseby = 100; 
+        for(int i = 0; i < reversehits.length; i++) {
+            int temprev = 0;
+            for(int j = i - numcloseby; j < i+numcloseby; j++) {
+                if(j > -1 && j < reversehits.length && reversehits[j]) {
+                    temprev++;
+                }
+            }
+            localfdr[i] = temprev;
+        }
+
+       for(int i = 0; i < localfdr.length; i++) {
+           int before = i >= numcloseby? numcloseby : i;
+           int after = localfdr.length - i >= numcloseby? numcloseby : (localfdr.length - i);
+//System.out.print(i + "\t" + localfdr[i] + "\t");
+           localfdr[i] = (localfdr[i]+0.0)/(1 + before + after);
+           if(i > 0) {
+//System.out.println(localfdr[i] + "\t" + localfdr[i-1]); 
+               if(localfdr[i] < localfdr[i-1]) {       
+                   localfdr[i] = localfdr[i-1];
+               }
+           }
+       }
+      
+System.out.println("Protein Group ID\tNumber of Members\tNumber of Forward Protein Hit\tNumber of Reverse Protein Hit\tGloble False Positive Rate\tConfidence(1 - Local False Positive Rate)\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tProtein Length\tProtein pI\tIsReverseHit\tRepresentative Protein accession\tDefline\tAll accessions\tAll Deflines");
+
+        int numforward = 0;
+        int numreverse = 0; 
+        for(int i = 0; i < allpgs.size(); i++) {
+            ProteinGroup pg = allpgs.get(i);
+            if(pg.isReverseHit()) {
+                numreverse++; 
+            } else {
+
+                numforward++;
+            }
+    // the allpgs should be sorted when this function is called, scoretype 2 for sumZScore, 5 for averageZScore, 6 for confidenceSum 
+    // 7 for confidenceProduct 
+            switch(scoretype) {
+                case 5 : pg.setAverageZScoreConfidence(1-localfdr[i]); break; // set averageZScoreConfidence 
+                case 2 : pg.setSumZScoreConfidence(1-localfdr[i]); break; // set sumZScoreConfidence 
+                default : pg.setSumZScoreConfidence(1-localfdr[i]); break; // set sumZScoreConfidence 
+            }
+
+
+            String repacc = pg.getRepresentativeAcc();
+            String repdefline = pg.getRepresentativeDefline();
+            String accs = pg.getAccs();
+            String deflines = pg.getDeflines();
+             
+System.out.println((i+1) + "\t" + pg.getNumProteinItems() + "\t" + numforward + "\t" + numreverse + "\t" + (numreverse/(0.0 + numforward)) + "\t" + (1-localfdr[i]) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.getRepresentativeLength() + "\t" + pg.getRepresentativePI() + "\t" + pg.isReverseHit() + "\t" + repacc + "\t" + repdefline + "\t" + accs + "\t" + deflines);
+        }
+    }
+   
+    // the allpgs should be sorted when this function is called 
+    private static void calcProteinConfidence(ArrayList<ProteinGroup> allpgs) {
+       
+        double [] localfdr = new double[allpgs.size()];
+        int [] globlefdr = new int[allpgs.size()];
+        boolean [] reversehits = new boolean[allpgs.size()];
+        int numreversepgs = 0;
+        int numpgs = 0;
+System.out.println("Number of Protein Groups Added\tNumReverseHit\tFDR\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tIsReverseHit");
+        for(int i = 0; i < allpgs.size(); i++) {
+            ProteinGroup pg = allpgs.get(i);
+            numpgs++;
+            if(pg.isReverseHit()) {
+                reversehits[i] = true;
+                globlefdr[i] = ++numreversepgs;
+                
+            }
+System.out.println(numpgs + "\t" + numreversepgs + "\t" + numreversepgs/(0.0 + numpgs) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.isReverseHit());
+        }
+        int numcloseby = 100; 
+        for(int i = 0; i < reversehits.length; i++) {
+            int temprev = 0;
+            for(int j = i - numcloseby; j < i+numcloseby; j++) {
+                if(j > -1 && j < reversehits.length && reversehits[j]) {
+                    temprev++;
+                }
+            }
+            localfdr[i] = temprev;
+        }
+
+       for(int i = 0; i < localfdr.length; i++) {
+           int before = i >= numcloseby? numcloseby : i;
+           int after = localfdr.length - i >= numcloseby? numcloseby : (localfdr.length - i);
+System.out.print(i + "\t" + localfdr[i] + "\t");
+           localfdr[i] = (localfdr[i]+0.0)/(1 + before + after);
+           if(i > 0) {
+System.out.println(localfdr[i] + "\t" + localfdr[i-1]); 
+               if(localfdr[i] < localfdr[i-1]) {       
+                   localfdr[i] = localfdr[i-1];
+               }
+           }
+       }
+      
+System.out.println("Protein Group ID\tNumber of Members\tNumber of Forward Protein Hit\tNumber of Reverse Protein Hit\tGloble False Positive Rate\tConfidence(1 - Local False Positive Rate)\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tProtein Length\tIsReverseHit\tRepresentative Protein accession\tDefline\tAll accessions\tAll Deflines");
+
+        int numforward = 0;
+        int numreverse = 0; 
+        for(int i = 0; i < allpgs.size(); i++) {
+            ProteinGroup pg = allpgs.get(i);
+            if(pg.isReverseHit()) {
+                numreverse++; 
+            } else {
+
+                numforward++;
+            }
+            String repacc = pg.getRepresentativeAcc();
+            String repdefline = pg.getRepresentativeDefline();
+            String accs = pg.getAccs();
+            String deflines = pg.getDeflines();
+System.out.println((i+1) + "\t" + pg.getNumProteinItems() + "\t" + numforward + "\t" + numreverse + "\t" + (numreverse/(0.0 + numforward)) + "\t" + (1-localfdr[i]) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.getRepresentativeLength() + "\t" + pg.isReverseHit() + "\t" + repacc + "\t" + repdefline + "\t" + accs + "\t" + deflines);
+        }
+    }
+    // put subset protein group in the super group, pgs are sorted by number of peptides
+    private static ArrayList<ProteinGroup> subsetProteins(ArrayList<ProteinGroup> allpgs) {
+System.out.println("Number of ProteinGroups before grouping subsets " + allpgs.size());
+        ArrayList<ProteinGroup> pgs = new ArrayList(20000);
+        int numpgs = 0;
+        for(int i = 0; i < allpgs.size(); i++) {
+            ProteinGroup current = allpgs.get(i);
+            if(current != null) {
+                pgs.add(current);
+                numpgs++;
+                allpgs.set(i, null);
+                HashSet<PeptideItem> currentset = current.getPeptideItems();
+                for(int j = i+1; j < allpgs.size(); j++) {
+                
+                    ProteinGroup next = allpgs.get(j);
+                    if(next != null) {
+
+                        HashSet<PeptideItem> nextset = next.getPeptideItems();
+                        //if(currentset.size() == nextset.size() && currentset.containsAll(nextset)) {
+                        if(currentset.containsAll(nextset)) {
+                            current.addSubset(next);
+                            allpgs.set(j, null);
+                        } 
+
+                    }
+                }
+            }
+        }        
+
+System.out.println("Final number of groupProtein after grouping subsets " + numpgs);
+        return pgs;
+    }
+
+
+    // remove pg from pgs if pg does not contain any unique peptide sequence
+    private static ArrayList<ProteinGroup> removeNoUniquePepitdeProteins(ArrayList<ProteinGroup> pgs, ProteinGroup pg) {
+        pgs.remove(pg);
+        HashSet<PeptideItem> settobechecked = pg.getPeptideItems();
+        HashSet<PeptideItem> allset = new HashSet(1000000);
+        for(Iterator<ProteinGroup> it = pgs.iterator(); it.hasNext();) {
+            allset.addAll(it.next().getPeptideItems());
+        }
+        if(!allset.containsAll(settobechecked)) {
+            pgs.add(pg);
+        } else {
+
+System.out.println("Protein with no unique peptide, not counted: " + pg.getAccessions() + "\tNumber of peptide: " + pg.getNumPeptideItems() + "\tNumber of spectral count: " + pg.getTotalSpectrumCount());
+        }
+
+        return pgs;
+    }
+    private static ArrayList<ProteinGroup> removeNoUniquePepitdeProteins(ArrayList<ProteinGroup> allpgs) {
+
+System.out.println("Number of groupProtein before removing no unique peptide proteins " + allpgs.size());
+        ArrayList<ProteinGroup> temp = new ArrayList(allpgs.size());
+        for(int i = allpgs.size() - 1; i > -1; i--) {
+            ProteinGroup pg = allpgs.get(i);
+            removeNoUniquePepitdeProteins(temp, pg);
+        }
+System.out.println("Number of groupProtein after not counting no unique peptide proteins " + temp.size());
+        return temp; 
+    }
+
+    private static void assignPeptideConfidence(ArrayList<PeptideItem> pis, int scoretype) {
+        
+        Collections.sort(pis, new PeptideItemComparator(scoretype)); //sort by  
+        double [] localfdr = new double[pis.size()];
+        int [] globlefdr = new int[pis.size()];
+        boolean [] reversehits = new boolean[pis.size()];
+        int numreversepgs = 0;
+        int numpgs = 0;
+//System.out.println("Number of Protein Groups Added\tNumReverseHit\tFDR\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tIsReverseHit");
+        for(int i = 0; i < pis.size(); i++) {
+            PeptideItem pg = pis.get(i);
+            numpgs++;
+            if(pg.isReverseHit()) {
+                reversehits[i] = true;
+                globlefdr[i] = ++numreversepgs;
+                
+            }
+//System.out.println(numpgs + "\t" + numreversepgs + "\t" + numreversepgs/(0.0 + numpgs) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.isReverseHit());
+        }
+        int numcloseby = 100; 
+        for(int i = 0; i < reversehits.length; i++) {
+            int temprev = 0;
+            for(int j = i - numcloseby; j < i+numcloseby; j++) {
+                if(j > -1 && j < reversehits.length && reversehits[j]) {
+                    temprev++;
+                }
+            }
+            localfdr[i] = temprev;
+        }
+
+       for(int i = 0; i < localfdr.length; i++) {
+           int before = i >= numcloseby? numcloseby : i;
+           int after = localfdr.length - i >= numcloseby? numcloseby : (localfdr.length - i);
+//System.out.print(i + "\t" + localfdr[i] + "\t");
+           localfdr[i] = (localfdr[i]+0.0)/(1 + before + after);
+           if(i > 0) {
+//System.out.println(localfdr[i] + "\t" + localfdr[i-1]); 
+               if(localfdr[i] < localfdr[i-1]) {       
+                   localfdr[i] = localfdr[i-1];
+               }
+           }
+       }
+      
+System.out.println("Protein Group ID\tNumber of Members\tNumber of Forward Protein Hit\tNumber of Reverse Protein Hit\tGloble False Positive Rate\tConfidence(1 - Local False Positive Rate)\tNumber of PeptideItem\tTotal Spectrum Count\tsumZScore\tProtein Length\tIsReverseHit\tRepresentative Protein accession\tDefline\tAll accessions\tAll Deflines");
+
+        int numforward = 0;
+        int numreverse = 0; 
+        for(int i = 0; i < pis.size(); i++) {
+            PeptideItem pg = pis.get(i);
+            if(pg.isReverseHit()) {
+                numreverse++; 
+            } else {
+
+                numforward++;
+            }
+            switch(scoretype) {
+                case 1 : pg.addConfidenceScore(1-localfdr[i]); break; // set averageZScoreConfidence 
+                case 2 : pg.addConfidenceScore(1-localfdr[i]); break; // set averageZScoreConfidence 
+                case 3 : pg.addConfidenceScore(1-localfdr[i]); break; // set averageZScoreConfidence 
+                case 4 : pg.addConfidenceScore(1-localfdr[i]); break; // set averageZScoreConfidence 
+                default : pg.setConfidence(1-localfdr[i]);
+
+//System.out.println((i+1) + "\t" + pg.getNumProteinItems() + "\t" + numforward + "\t" + numreverse + "\t" + (numreverse/(0.0 + numforward)) + "\t" + (1-localfdr[i]) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.getRepresentativeLength() + "\t" + pg.isReverseHit() + "\t" + repacc + "\t" + repdefline + "\t" + accs + "\t" + deflines);
+                          break; // set sumZScoreConfidence 
+ 
+            }
+
+
+             
+//System.out.println((i+1) + "\t" + pg.getNumProteinItems() + "\t" + numforward + "\t" + numreverse + "\t" + (numreverse/(0.0 + numforward)) + "\t" + (1-localfdr[i]) + "\t" + pg.getNumPeptideItems() + "\t" + pg.getTotalSpectrumCount() + "\t" + pg.getSumZScore() + "\t" + pg.getRepresentativeLength() + "\t" + pg.isReverseHit() + "\t" + repacc + "\t" + repdefline + "\t" + accs + "\t" + deflines);
+        }
+
+
+    }
+
+    private static void calcPeptideConfidenceScore(ArrayList<PeptideItem> pis) {
+        //System.out.println("Sorting peptides by best ZScore");
+        //assignPeptideConfidence(pis, 1); // with best ZScore 
+        //System.out.println("Sorting peptides by sumXCorr");
+        //assignPeptideConfidence(pis, 2); // with sumZSorr 
+        //assignPeptideConfidence(pis, 3); // with sumXCorr 
+        //assignPeptideConfidence(pis, 4); // with occurence 
+        //assignPeptideConfidence(pis, 5); // with bestXCorr 
+        //System.out.println("Sorting peptides by sumXCorr");
+        //assignPeptideConfidence(pis, 3); // with sumXCorr 
+
+        System.out.println("Sorting peptides by sumConfidence");
+        assignPeptideConfidence(pis, 6); // with sumConfidence 
+
+    }
+
+     
+    private static ArrayList<PeptideItem> filterPeptideItems(HashMap<String, PeptideItem> seqcharge2peptideitem, double peptidefdr) {
+
+        HashSet<String> uniquepeptideseqs = new HashSet(1000000);
+        HashSet<String> uniquereversedpeptideseqs = new HashSet(1000000);
+        HashSet<String> uniqueforwardpeptideseqs = new HashSet(1000000);
+
+        HashSet<String> filtereduniquereversedpeptideseqs = new HashSet(1000000);
+        HashSet<String> filtereduniqueforwardpeptideseqs = new HashSet(1000000);
+
+        ArrayList<PeptideItem> filteredPeptideItems = new ArrayList();
+        ArrayList<PeptideItem> pis = new ArrayList();
+ 
+        pis.addAll(seqcharge2peptideitem.values());
+
+        // now using confidence for peptides
+        calcPeptideConfidenceScore(pis); 
+        Collections.sort(pis, new PeptideItemComparator(6));
+        //Collections.sort(pis);
+
+        int numforward = 0;
+        int numreverse = 0;
+        int totalSpectralCounts = 0;
+        //System.out.println("Number of Forward Hits\tNumber of Reverse Hit\tFalse Positive Rate\tSumZScore\tOccurance\tTotal Spectrum Count\tNumber of Unique Peptide Sequence added\tSequence\tCharge\tIsReverseHit");
+        for(Iterator<PeptideItem> it = pis.iterator(); it.hasNext();) {
+            PeptideItem pi = it.next();
+            totalSpectralCounts += pi.getTotalSpectrumCount();
+            uniquepeptideseqs.add(pi.getSequence());
+            if(pi.isReverseHit()) {
+                numreverse++;
+                uniquereversedpeptideseqs.add(pi.getSequence());
+            } else {
+                numforward++;
+                uniqueforwardpeptideseqs.add(pi.getSequence()); 
+            }
+
+            double fdr = uniquereversedpeptideseqs.size()/(uniqueforwardpeptideseqs.size()+0.0);
+            if(fdr <= peptidefdr) {
+                filteredPeptideItems.add(pi);
+                if(pi.isReverseHit()) {
+                    filtereduniquereversedpeptideseqs.add(pi.getSequence());
+                } else {
+                    filtereduniqueforwardpeptideseqs.add(pi.getSequence()); 
+                }
+                
+            }
+            //System.out.println(numforward + "\t" + numreverse + "\t" + (numreverse+0.0)/(numforward) + "\t" + pi.getSumZScore() + "\t" + pi.getOccurance() + "\t" + pi.getTotalSpectrumCount() + "\t" + uniquepeptideseqs.size() + "\t" + pi.getSequence() + "\t" + pi.getCharge() + "\t" + pi.isReverseHit());
+        }
+       
+        System.out.println("\n\nTotal Number of PeptideItems Accepted: " + filteredPeptideItems.size() + "\tout of  Total Number of PeptideItems of " + (numreverse + numforward)+"\tacceptedUniqueReversedSeq: " + filtereduniquereversedpeptideseqs.size() + "\tacceptedUniqueForwardSeq: " + filtereduniqueforwardpeptideseqs.size()); 
+        System.out.println("Total number of spectra identified: " + totalSpectralCounts);
+        return filteredPeptideItems; 
+    }
+
+    // adjust protein score based on the average score of reversed ids with similar protein length
+    public static void assignProteinScore(HashSet<ProteinItem> proteins) {
+
+        HashMap<ProteinItem, Double> proteinitem2avgreversescore = new HashMap(1000000); // average of reversed protein scores
+        ArrayList<ProteinItem> prots = new ArrayList(proteins);
+        Collections.sort(prots, new ProteinItemComparator(1)); //sort by protein length
+        //Collections.reverse(prots); // short to length
+        int windowsize = 200;
+        ArrayList<ProteinItem> templist = new ArrayList(windowsize);
+        int numprocessed = 0;
+        double sumreversedscore = 0; 
+        int numreversed = 0;
+        int numlengthbin = 100;
+        int [] lengthfreq = new int[numlengthbin];
+        int [] reversedlengthfreq = new int[numlengthbin];
+        int totalforwardprot = 0;       
+        int totalreversedprot = 0;       
+ 
+        for(Iterator<ProteinItem> it = prots.iterator(); it.hasNext();) {
+            ProteinItem pi = it.next();
+            int protlength = pi.getFasta().getLength();
+            if(pi.isReverseHit()) { 
+                totalreversedprot++;
+                if(protlength >= 10000) { 
+                    reversedlengthfreq[numlengthbin-1]++;
+                } else {
+                    reversedlengthfreq[protlength/100]++;
+                }
+            } else {
+                totalforwardprot++;
+                if(protlength >= 10000) { 
+                    lengthfreq[numlengthbin-1]++;
+                } else {
+                    lengthfreq[protlength/100]++;
+                }
+
+            }
+            
+            // correct by the protein score by protein length
+System.out.print("protein length: " + pi.getFasta().getLength());
+            String ac = pi.getFasta().getLongAccession();
+            double score = pi.getSumZScore();
+            numprocessed++;
+            if(ac.startsWith("Revers")) {
+                sumreversedscore +=  pi.getSumZScore();
+                numreversed++;
+            } 
+            templist.add(pi);
+            if(templist.size() == windowsize || numprocessed == prots.size() ) {
+                double avgreverscore = sumreversedscore/numreversed;
+System.out.println("avgreverscore: " + avgreverscore + "\tnumprocessed: " + numprocessed);
+                Iterator<ProteinItem> it1 = templist.iterator();
+                while(it1.hasNext()) {
+                    ProteinItem temppi = it1.next();
+                    //temppi.setProteinScore(temppi.getSumZScore() - avgreverscore);
+                    temppi.setProteinScore(temppi.getBestPeptideScore());
+  
+                }
+
+                templist = new ArrayList(windowsize);
+                sumreversedscore = 0;
+                numreversed = 0;
+
+            }
+          
+        }
+        StringBuffer lensb = new StringBuffer();
+        StringBuffer freqsb = new StringBuffer();
+        StringBuffer reversedfreqsb = new StringBuffer();
+        StringBuffer relativefreqsb = new StringBuffer();
+        StringBuffer relativereversedfreqsb = new StringBuffer();
+        lensb.append("Protein Length");
+        freqsb.append("Forward Protein Frequency");
+        reversedfreqsb.append("Reversed Protein Frequency");
+        relativefreqsb.append("Forward Protein Relative Frequency");
+        relativereversedfreqsb.append("Reversed Protein Relative Frequency");
+        
+        for(int i = 0; i < numlengthbin; i++) {
+            lensb.append("\t" + i*100 + "-" + (i+1)*100);
+            freqsb.append("\t" + lengthfreq[i]);
+            relativefreqsb.append("\t" + lengthfreq[i]/(0.0+totalforwardprot));
+            reversedfreqsb.append("\t" + reversedlengthfreq[i]);
+            relativereversedfreqsb.append("\t" + reversedlengthfreq[i]/(0.0+totalreversedprot));
+            
+        } 
+        System.out.println(lensb);
+        System.out.println(freqsb);
+        System.out.println(reversedfreqsb);
+        System.out.println(relativefreqsb);
+        System.out.println(relativereversedfreqsb);
+    }
+/*
+    // get the conterpart protein - ie the same protein, reversed and forward copy
+    public static void assignProteinScore(HashSet<ProteinItem> proteins) {
+        HashMap<String, ProteinItem> ac2protein = new HashMap(1000000);
+        HashMap<String, ProteinItem> reverseac2protein = new HashMap(1000000);
+       
+        for(Iterator<ProteinItem> it = proteins.iterator(); it.hasNext();) {
+            ProteinItem pi = it.next();
+            String ac = pi.getFasta().getLongAccession();
+            
+            ac2protein.put(ac, pi);
+          
+        }
+
+        for(Iterator<ProteinItem> it = proteins.iterator(); it.hasNext();) {
+            ProteinItem pi = it.next();
+            String ac = pi.getFasta().getLongAccession();
+            
+            ProteinItem counterpart = null;
+            String counterpartac = null;
+            if(ac.startsWith("Revers")) { 
+                counterpartac = ac.split("Reverse_")[1];
+            } else {
+                
+                counterpartac = ("Reverse_") + ac;
+            }
+
+            counterpart = ac2protein.get(counterpartac);
+            double score = pi.getSumZScore();
+            if(counterpart != null) {
+                score -= counterpart.getSumZScore();
+System.out.println("Counterpart found for " + ac + "\t counterpartac: " + counterpartac );
+            } else {
+System.out.println("Counterpart not found for " + ac + "\t counterpartac: " + counterpartac );
+            }
+            pi.setProteinScore(score);
+        }
+        
+    }
+*/
+
+    // in case the pepseq is found in both forward and reverse protein, return only the forward protein
+    private static ArrayList<Fasta> peptideseq2Fastas(String pepseq, PrefixDb pdb) {
+        ArrayList<Fasta> ffastas = new ArrayList(); // for forward hits
+        ArrayList<Fasta> rfastas = new ArrayList(); // for reversed hits
+         
+        Iterator<Fasta> prots = pdb.peptideseq2Fastas(pepseq).iterator();
+        while(prots.hasNext()) {
+            Fasta f = prots.next();
+            String  protseq = f.getSequence();
+            //String myac = f.getAccession();
+            
+            if(protseq.indexOf(pepseq) != -1) {
+                if(f.isReversed()) {
+                    rfastas.add(f);    
+                } else {
+                    ffastas.add(f);
+                }
+            }
+        }
+        if(ffastas.size() == 0) {
+            return rfastas;
+        } else {
+            return ffastas;
+        }
+    }
+    public static HashSet<ProteinItem> mapPeptide2Proteins(String database,  ArrayList<PeptideItem> acceptedpeptides) throws IOException {
+        HashSet<ProteinItem> proteins = new HashSet(1000000);
+        HashMap<String, ProteinItem> ac2protitem = new HashMap(1000000);
+        long starttime = System.nanoTime();
+        PrefixDb pdb = new PrefixDb(database);
+
+        long endtime = System.nanoTime();
+        System.out.println("Time used to create PrefxiDb: " + (endtime - starttime)/1000000);
+        starttime = System.nanoTime();
+        int numpeptideprocessed = 0;
+        for(Iterator<PeptideItem> it = acceptedpeptides.iterator(); it.hasNext();) {
+            PeptideItem pi = it.next();
+            //String pepseq = pi.getSequence();
+            String pepseq = pi.getSeqWithoutMod();
+            //Iterator<Fasta> prots = pdb.peptideseq2Fastas(pepseq).iterator();
+            Iterator<Fasta> prots = peptideseq2Fastas(pepseq, pdb).iterator();
+            while(prots.hasNext()) {
+                Fasta f = prots.next();
+                String  protseq = f.getSequence();
+                String myac = f.getAccession();
+                ProteinItem proti = ac2protitem.get(myac);
+                if(protseq.indexOf(pepseq) != -1) {
+                    if(proti == null) {
+                        proti = new ProteinItem(f);
+                        proteins.add(proti);
+                        ac2protitem.put(myac, proti);
+
+                    }
+
+                    pi.addProteinItem(proti);
+                    proti.addPeptideItem(pi);
+                }
+                
+            }
+           
+//System.out.print("Number of Peptides Processed: " + ++numpeptideprocessed + "\r");
+        }
+        endtime = System.nanoTime();
+        System.out.println("Time used to map peptide to proteins: " + (endtime - starttime)/1000000);
+ 
+        int totalnumpeptides = 0;
+        for(Iterator<ProteinItem> it = proteins.iterator(); it.hasNext();) {
+            ProteinItem pi = it.next();
+            totalnumpeptides += pi.getNumPeptides();
+
+        }
+        int numproteinadded = proteins.size();
+System.out.println("\nNumber of protein items added " + proteins.size() + "\tAverage number of peptide per protein: " + totalnumpeptides/(0.0 + numproteinadded) );
+for(Iterator<PeptideItem> it = acceptedpeptides.iterator(); it.hasNext();) {
+    PeptideItem pi = it.next();
+    if(pi.isReverseHit() && pi.containsBothForwardAndReversedHits()) {
+System.out.println("Peptide found in both forward and reversed: " + pi.getSequence() + "\tsumXCorr: " + pi.getSumXCorr() + "\tbest ZScore: " + pi.getBestZScore() + "\tOccurance: " + pi.getOccurance() + "\tsumZScore: " + pi.getSumZScore());
+    }
+}
+/*
+
+
+        FileInputStream fis = new FileInputStream(new File(database));
+        Iterator<Fasta> fastas = FastaReader.getFastas(fis);
+        int count = 0;
+        int numproteinadded = 0;
+        int totalnumpeptides = 0;
+        while(fastas.hasNext()) {
+           
+            Fasta f = fastas.next();
+            count++;
+            String protseq = f.getSequence();
+            ProteinItem proti = null;
+            String myac = f.getAccession();
+            Iterator<PeptideItem> it = acceptedpeptides.iterator();
+System.out.print("processing " + myac + " " + count + "\r");
+            int numpeptides = 0;
+            while(it.hasNext()) {
+                PeptideItem pi = it.next();
+                //String pepseq = pi.getSequence();
+                String pepseq = pi.getSeqWithoutMod();
+//System.out.println("processing peptide sequence " + pepseq);
+                if(protseq.indexOf(pepseq) != -1) {
+                    numpeptides++;
+                    if(proti == null) {
+                        proti = new ProteinItem(f);
+                        proteins.add(proti);
+                        numproteinadded++;
+
+                    }
+
+                    pi.addProteinItem(proti);
+                    proti.addPeptideItem(pi);
+                }
+
+            }
+           
+            totalnumpeptides += numpeptides; 
+        }
+*/
+        return proteins;
+    }
+    public static void main(String[] args) throws Exception{
+
+       
+        double peptidefdr = 0.05; 
+        peptideScoreType = 1;
+       
+        if(args.length < 2) {
+            System.out.println(USAGE);
+            System.exit(0);
+        }
+        dtaselectfiles = args[0];
+        database = args[1];
+        if(args.length > 2) {
+            peptidefdr = Double.parseDouble(args[2]);
+        }
+
+	BufferedReader br = null;
+        
+        //if(args.length < 2) {
+        //    help();
+        //}
+        //PrintStream ps = new PrintStream("/data/8/taoxu_on_data8/projects/nhlbi/test1.copa");
+ //       PrintStream ps = new PrintStream(outputfile);
+        ac2Fasta =  getProteinMap(database);
+        //int copacount = 0;
+	try {
+           
+            ArrayList<String> folders = new ArrayList(); 
+	    br = new BufferedReader(new FileReader(dtaselectfiles));
+            String line = null;
+            line = br.readLine();
+            while(line != null) {
+                line = line.trim();
+                if(!"".equals(line)) {
+                    File dtafile = new File(line);
+                    if(dtafile.isFile() || dtafile.isDirectory()) {
+                        folders.add(line); 
+                    } else {
+
+                        System.out.println(dtafile + " does not exist");
+                    }
+
+                } 
+                line = br.readLine();
+            } 
+            br.close();
+
+
+            int numpeptide = 0;
+            HashSet<String> uniquepepitdes = new HashSet(10000000);
+            HashSet<String> uniquepepitdesignorecharge = new HashSet(10000000);
+            HashMap<String, PeptideItem> seqcharge2peptideitem = new HashMap(1000000);
+//ps.println("Number of experiment: " + folders.size());
+            for(int i = 0; i < folders.size(); i++) {
+                String folder = folders.get(i);
+                if(!"".equals(folder)) {
+                    System.out.println("Now processing " + folder);
+                    String dtafilter = folder;
+                    if(!dtafilter.endsWith("DTASelect-filter.txt")) {
+                        dtafilter = folder + "/DTASelect-filter.txt";
+                    }
+
+
+                    DTASelectFilterReader reader = new DTASelectFilterReader(dtafilter);
+                    HashSet<String> uniquepeptides = new HashSet(1000000);
+                    for (Iterator<Protein> itr = reader.getProteins(); itr.hasNext();) {
+                        Protein p = itr.next();
+                        String proteinid = p.getAccession();
+                        boolean isreversehit = proteinid.startsWith("Reverse");
+//System.out.println("protien id: " + proteinid);
+                        
+                        for(Iterator<Peptide> pepItr=p.getPeptides(); pepItr.hasNext(); ) {
+                            numpeptide++;
+                            Peptide peptide = pepItr.next();
+                            //String pepseq = peptide.getSeqWithNoModification();
+                            //String seq = peptide.getSequence();
+                            String seq = peptide.getMidSeq();
+                            String filename = peptide.getFileName();
+                            String scan = peptide.getLoScan();
+                            String charge = peptide.getChargeState();
+                            int chargestate = Integer.parseInt(charge);
+                            int scanInt = Integer.parseInt(scan);
+                            
+                            double spvalue = peptide.getSpScoreValue();
+                            String seqcharge = seq + charge; 
+                            uniquepepitdes.add(seqcharge);
+                            uniquepepitdesignorecharge.add(seq);
+                            PeptideItem pi = seqcharge2peptideitem.get(seqcharge);
+                            if(pi == null) {
+                                pi = new PeptideItem(seq, chargestate, isreversehit, peptideScoreType, folders.size());
+                                seqcharge2peptideitem.put(seqcharge, pi);
+                            }
+                            if(!uniquepeptides.contains(seqcharge)) {
+                                pi.addPeptide(peptide, i); // to ensure the seqcharge only be added only for each DTASelect-filter.txt file
+                                uniquepeptides.add(seqcharge);
+                            }
+                            //System.out.println("File name: " + filename + "\t" + scan);
+
+                        }
+                    }
+                    System.out.println("finished reading DTASelect-filter.txt");
+                    reader.close();
+
+                     
+                } 
+            } 
+
+            System.out.println("Number of Peptide Identified: " + numpeptide +  "\tNumber of unique peptides: " + uniquepepitdes.size() + "\tNumber of unique peptides ignore charge: " + uniquepepitdesignorecharge.size());
+
+
+            System.out.println("Starting to map peptides to proteins");
+
+           
+            ArrayList<PeptideItem> acceptedPeptides = filterPeptideItems(seqcharge2peptideitem, peptidefdr);
+ 
+
+            //HashSet<ProteinItem> protitems = mapPeptide2Proteins(database, seqcharge2peptideitem);
+            HashSet<ProteinItem> protitems = mapPeptide2Proteins(database, acceptedPeptides);
+
+
+            // porteinScores will not be used in the final confidence, so this statement might be deleted
+            //assignProteinScore(protitems);
+             
+            System.out.println("Finished mapping peptides to proteins");
+            System.out.println("Start to group proteins");
+            long starttime = System.nanoTime();
+
+            ArrayList<ProteinGroup> pgs = groupProteins(protitems);
+            long endtime = System.nanoTime();
+            System.out.println("Finished grouping proteins, time used: " + (endtime - starttime)/1000000);
+
+
+            // to properly remove subset proteins, it is important for sort protein groups by pepitde number
+            Collections.sort(pgs, new ProteinGroupComparator(4)); // sort by peptide number
+            starttime = System.nanoTime();
+            ArrayList<ProteinGroup> finalpgs = subsetProteins(pgs);
+            endtime = System.nanoTime();
+            System.out.println("Time used for subsetProteins: " + (endtime - starttime)/1000000);
+            Collections.sort(finalpgs); 
+            System.out.println("Before removing protein groups with no unique pepetides: " + finalpgs.size());
+            starttime = System.nanoTime();
+            ArrayList<ProteinGroup> pgsafterremovingnouniquepepitde =  removeNoUniquePepitdeProteins(finalpgs);
+            endtime = System.nanoTime();
+            
+            System.out.println("After removing protein protein groups with no unique pepetides: " + pgsafterremovingnouniquepepitde.size());
+            System.out.println("Time  used to remove protein groups with no unique peptides: " + (endtime - starttime)/1000000);
+
+
+
+
+
+
+
+
+
+
+            //Collections.sort(pgsafterremovingnouniquepepitde);
+            //calcProteinConfidence(pgsafterremovingnouniquepepitde);
+
+
+            //System.out.println("\n\n\nSorting protein by sumZScore and calculating protein confidence based on sumZScore");
+            //Collections.sort(pgsafterremovingnouniquepepitde, new ProteinGroupComparator(2));
+            //calcProteinConfidence(pgsafterremovingnouniquepepitde, 2);
+
+
+            //System.out.println("\n\n\nSorting protein by AverageZScore and calculating protein confidence basedon averageZScore");
+            //Collections.sort(pgsafterremovingnouniquepepitde, new ProteinGroupComparator(5));
+            //calcProteinConfidence(pgsafterremovingnouniquepepitde, 5);
+
+            starttime = System.nanoTime();
+            System.out.println("\n\n\nSorting protein by confidenceSum"); // this works the best
+            Collections.sort(pgsafterremovingnouniquepepitde, new ProteinGroupComparator(6));
+            calcProteinConfidence(pgsafterremovingnouniquepepitde, 6);
+            endtime = System.nanoTime();
+            System.out.println("Time used to calculate proteinConfidence: " + (endtime - starttime)/1000000);
+
+            //System.out.println("Sorting protein by confidenceProduct");
+            //Collections.sort(pgsafterremovingnouniquepepitde, new ProteinGroupComparator(7));
+            //calcProteinConfidence(pgsafterremovingnouniquepepitde, 7);
+          
+
+
+            //ps.close();
+            //System.out.println("Number of Peptide Identified: " + numpeptide + "\tNumber of unique peptides: " + uniquepepitdes.size() + "\tNumber from Map: " + seqcharge2BestPeptide.size());
+            
+
+	} finally {
+	    //tidy up
+	    if(br != null){
+		br.close();
+	    }
+	}
+    }
+
+    private static String getUniProtAccession(String longac) {
+        String [] arr = longac.split("\\|");
+        String ac = arr[0];
+        if(arr.length > 1) {
+            if(longac.startsWith("Reverse")) {
+                ac = arr[0] + "|" + arr[1];
+            } else {
+                ac = arr[1];
+            }
+        }
+        return ac;
+    }
+}
+
