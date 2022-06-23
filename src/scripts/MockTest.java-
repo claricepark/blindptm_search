@@ -1,0 +1,161 @@
+package scripts;
+
+import blazmass.dbindex.DBIndexer;
+import blazmass.dbindex.ProteinCache;
+import edu.scripps.pms.mspid.*;
+import edu.scripps.pms.util.io.SpectrumReader;
+import edu.scripps.pms.util.spectrum.PeakList;
+import edu.scripps.pms.util.spectrum.Zline;
+import jcuda.driver.CUstream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static jcuda.driver.CUstream_flags.CU_STREAM_NON_BLOCKING;
+import static jcuda.driver.JCudaDriver.*;
+
+public class MockTest {
+
+    public void demo(String searchParam) throws Exception {
+        // Setting up jCuda
+        CudaDeviceContext context = new CudaDeviceContext(0, false);
+        CudaDeviceContext.SINGLE_SCAN_MODE_PTX = "/home/ip2/gpu/calcXScoresSingleScan.ptx";
+        context.prepare();
+        cuCtxSetCurrent(context.getContext());
+
+        SearchParams sp = new SearchParams("", searchParam);
+        MassCalculator mc = new MassCalculator(sp);
+        DBIndexer db = ProlucidSearchEngine.createDBIndexer(sp);
+        CUstream stream = new CUstream();
+        cuStreamCreate(stream, CU_STREAM_NON_BLOCKING);
+
+        BlockingQueue<PeptideUploadPrimitives> primitivesBlockingQueue = new LinkedBlockingQueue<>();
+        for (int i = 0; i < 300; i++) {
+            primitivesBlockingQueue.add(new PeptideUploadPrimitives());
+        }
+        GPUResourceManager resourceManager = new GPUResourceManager(sp, mc, 75, 6000, context, stream);
+        CudaBinomial cudaBinomial = new CudaBinomial(context.getSetBinomial(), mc);
+        cudaBinomial.assignBinomials(stream);
+
+        ProteinCache.clearCache();
+
+        GPUSearchInterface gpuSearchInterface = SpectraSearch.generateWorkSpace(sp, context, db, resourceManager, primitivesBlockingQueue);
+        for (int j = 0; j < 2; j++) {
+            SpectrumReader spectrumReader
+                    = new SpectrumReader("/home/ip2/gpu/sge_20190819_Hela_200ng_704_range_815.ms2",
+                    "ms2");
+            Iterator<PeakList> peakListIterator = spectrumReader.getSpectra();
+            while (peakListIterator.hasNext()) {
+                PeakList peakList = peakListIterator.next();
+                Iterator<Zline> zItr = peakList.getZlinesIterator();
+                while (zItr.hasNext()) {
+                    Zline zline = zItr.next();
+                    SearchResult sr = gpuSearchInterface.search(zline, peakList);
+          //          System.out.println(sr.outputResults());
+                }
+            }
+            spectrumReader.closeDataFile();
+
+        }
+
+        gpuSearchInterface.free();
+        db.close();
+        cudaBinomial.free();
+
+        cuStreamSynchronize(stream);
+        resourceManager.free();
+        cuStreamDestroy(stream);
+
+        context.shutdown();
+    }
+/*
+    public void demoParseDdata() throws Exception {
+
+        CudaDeviceContext context = new CudaDeviceContext(0, false);
+        CudaDeviceContext.SINGLE_SCAN_MODE_PTX = "/home/ip2/gpu/calcXScoresSingleScan.ptx";
+        context.prepare();
+
+        cuCtxSetCurrent(context.getContext());
+        SearchParams sp = new SearchParams("", "/home/ip2/gpu/search.xml");
+        MassCalculator mc = new MassCalculator(sp);
+        DBIndexer db = ProlucidSearchEngine.createDBIndexer(sp);
+        CUstream stream = new CUstream();
+        BlockingQueue<PeptideUploadPrimitives> primitivesBlockingQueue = new LinkedBlockingQueue<>();
+        for (int i = 0; i < 300; i++) {
+            primitivesBlockingQueue.add(new PeptideUploadPrimitives());
+        }
+        GPUResourceManager resourceManager = new GPUResourceManager(sp, mc, 75, 6000, context, stream);
+        CudaBinomial cudaBinomial = new CudaBinomial(context.getSetBinomial(), mc);
+        cudaBinomial.assignBinomials(stream);
+        GPUSearchInterface gpuSearchInterface = SpectraSearch.generateWorkSpace(sp, context, db, resourceManager, primitivesBlockingQueue);
+        for (int j = 0; j < 2; j++) {
+            SpectrumReader spectrumReader
+                    = new SpectrumReader("/home/ip2/gpu/sge_20190819_Hela_200ng_704_range_815.ms2",
+                    "ms2");
+            Iterator<PeakList> peakListIterator = spectrumReader.getSpectra();
+            while (peakListIterator.hasNext()) {
+                PeakList peakList = peakListIterator.next();
+                Iterator<Zline> zItr = peakList.getZlines();
+                while (zItr.hasNext()) {
+                    Zline zline = zItr.next();
+                    SearchResult sr = gpuSearchInterface.search(zline, peakList);
+                //    System.out.println(sr.outputResults());
+                }
+            }
+        }
+        cuStreamSynchronize(stream);
+        //cuStreamDestroy(stream);
+        resourceManager.free();
+    }
+*/
+
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, SQLException {
+        for(int i=0;i<2;i++) {
+            System.out.println("=======\t" + i);
+            MockTest demoGpuEngine = new MockTest();
+            try {
+                demoGpuEngine.demo("/home/ip2/gpu/mouse/search.xml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            LocalDate localDate = LocalDate.now();
+            System.out.println(localDate.toString());
+
+            // Thread.sleep(10000);
+        }
+
+       // System.exit(0);
+        System.out.println("done...");
+
+        for(int i=0;i<2;i++) {
+            System.out.println("=======\t" + i);
+            MockTest demoGpuEngine = new MockTest();
+            try {
+                //demoGpuEngine.demo("/home/ip2/gpu/mouse/search.xml");
+                demoGpuEngine.demo("/home/ip2/gpu/search.xml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            LocalDate localDate = LocalDate.now();
+            System.out.println(localDate.toString());
+
+           // Thread.sleep(10000);
+        }
+
+        System.out.println("done...");
+
+
+
+
+        for(int i=0;i<1000;i++) {
+            System.out.println("sleep...");
+            Thread.sleep(100000000);
+        }
+    }
+}

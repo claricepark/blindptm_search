@@ -1,0 +1,40 @@
+Maximum number of internal mis : -1
+maxInternalMisCleavage value is now: -1
+Number of thread	1
+Total memory	209387520
+Memory used after loading the database	89084528
+
+Now processing 1.ms2
+Total Memory after loading the search engine	209387520	Free memory	66613872
+Memory used after loading the search engine	142773648
+Host name	jaina
+TotalNumSpectra	23
+NumSearched	0	23
+NumSearched	1	23	Scan#: 63811	209	Free memory	65
+NumSearched	2	23	Scan#: 63813	FNumPeaks: 143	+2	NumPeaks: 144	M+H+: 1646.8934326171875	ptrue: 0.09443713251357172	287	Free memory	131
+NumSearched	3	23	Scan#: 63814	FNumPeaks: 132	+3	NumPeaks: 132	M+H+: 2399.184326171875	ptrue: 0.06963107402446551	305	Free memory	149
+NumSearched	4	23	Scan#: 63815	305	Free memory	149
+NumSearched	5	23	Scan#: 63817	FNumPeaks: 119	+2	NumPeaks: 119	M+H+: 1619.802490234375	ptrue: 0.10036296865301185	307	Free memory	159
+NumSearched	6	23	Scan#: 63818	FNumPeaks: 49	+2	NumPeaks: 49	M+H+: 1388.76416015625	ptrue: 0.048121514062329486	308	Free memory	162
+NumSearched	7	23	Scan#: 63819	308	Free memory	162
+NumSearched	8	23	Scan#: 63820	308	Free memory	162
+NumSearched	9	23	Scan#: 63821	308	Free memory	162
+NumSearched	10	23	Scan#: 63822	308	Free memory	162
+NumSearched	11	23	Scan#: 63823	308	Free memory	162
+NumSearched	12	23	Scan#: 63825	308	Free memory	162
+NumSearched	13	23	Scan#: 63826	308	Free memory	162
+NumSearched	14	23	Scan#: 63827	308	Free memory	162
+NumSearched	15	23	Scan#: 63828	308	Free memory	162
+NumSearched	16	23	Scan#: 63829	308	Free memory	162
+NumSearched	17	23	Scan#: 63830	308	Free memory	162
+NumSearched	18	23	Scan#: 63831	FNumPeaks: 200	+3	NumPeaks: 276	M+H+: 2537.183349609375	ptrue: 0.1551477050834102	281	Free memory	124
+NumSearched	19	23	Scan#: 63832	FNumPeaks: 46	+3	NumPeaks: 46	M+H+: 2226.138671875	ptrue: 0.041231495637544746	277	Free memory	123
+NumSearched	20	23	Scan#: 63833	277	Free memory	123
+NumSearched	21	23	Scan#: 63834	FNumPeaks: 51	+3	NumPeaks: 51	M+H+: 2214.0966796875	ptrue: 0.05096137659401824	296	Free memory	142
+NumSearched	22	23	Scan#: 63835	FNumPeaks: 109	+4	NumPeaks: 109	M+H+: 3845.804443359375	ptrue: 0.09910480838549582	356	Free memory	186
+NumSearched	23	23	Scan#: 63836	356	Free memory	186
+Total Memory after the search	356384768	Free memory	184625176
+Memory used after the search	171759592
+NumSpectraSearched: 8	 numSpectraIgnored: 15	totalNumSpectra: 23
+Time used for searching 1.ms2: 20874
+

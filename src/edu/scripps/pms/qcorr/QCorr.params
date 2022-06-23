@@ -1,0 +1,24 @@
+#QCorr Paramters
+InjWindow		4		#isolation window size
+MassAccuracy		0.1		#bin width for binning out spectra
+Normalize		false		#normalizes mass spectra before cross correlation
+FilterPeaks		true		#sorts peaks by intensity and uses peaks with rank above PeakThreshold
+PeakThreshold		200		#minimum rank of peak threshold
+
+#Output
+OutputFile	true	#creates precusors.txt file containing mol. weights and scores 
+OutputCCArray	false	#outputs CC array file
+
+#Advanced Features
+NumIons			20		#number of fragment pairs
+FilterSpectra		true		#removes spectra from ms2 file
+OverWriteMS2		true		#overwrites current ms2 file
+ReplaceMW		false		#replaces MW in ms2 file with calculated MW
+AssignCharge		false		#replaces charge in MS2 file with highest scoring charge state
+FilterThreshold	101,101,101,101		#correlation score thresholds for +1, +2, and +3 charge states respectively 
+DeChargeSpectrum	false		#decharges spectrum to all +1 ions 
+IsotopeAccuracy		500		#mass accuracy for fragment ions in units of ppm
+AssignMWFromMS1		false		#uses MW from MS1 scan to narrow MW range 
+
+
+

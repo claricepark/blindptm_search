@@ -1,0 +1,83 @@
+package scripts.imscore;
+
+import com.mongodb.util.Hash;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+
+public class GeneralEvaluation {    
+
+    public static void main(String args[]) throws IOException
+    {
+//        run(args[0]);
+        String origFile = "/media/ip2/b4264437-ed6a-462f-80b1-6450c9beb1fb/data/DDA/20200821_K562_400ng_60_min_1_Slot1-1_1_1642.d/im_corrected_human/orig_top_both_imNoim/test/DTASelect-filter.txt";
+        String imFile = "/media/ip2/b4264437-ed6a-462f-80b1-6450c9beb1fb/data/DDA/20200821_K562_400ng_60_min_1_Slot1-1_1_1642.d/im_corrected_human/im_top_both_imNoim/cstest/DTASelect-filter.txt";
+        String diffFile = "/media/ip2/b4264437-ed6a-462f-80b1-6450c9beb1fb/data/DDA/20200821_K562_400ng_60_min_1_Slot1-1_1_1642.d/im_corrected_human/orig_top_both_imNoim/test/diff";
+
+        run(origFile, imFile, diffFile);
+    }
+
+
+    public static void run(String origFile, String imFile, String diffFile) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(diffFile));
+
+        String eachline;
+        boolean isTarget=true;
+
+        Set<String> imUniqueList = new HashSet<>();
+        Set<String> origUniqueSet = new HashSet<>();
+
+        while (null != (eachline = br.readLine())) {
+
+            if(!eachline.startsWith("<") && !eachline.startsWith(">"))
+                continue;
+
+            if(eachline.startsWith(">"))
+                imUniqueList.add(eachline.substring(2));
+            else if(eachline.startsWith("<"))
+                origUniqueSet.add(eachline.substring(2));
+        }
+
+//        System.out.println(imUniqueList);
+//        System.out.println(origUniqueSet);
+
+        br.close();
+
+        checkDTASelect(origFile, origUniqueSet);
+    }
+
+    public static void checkDTASelect(String dtaFile, Set<String> checkSet) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(dtaFile));
+
+        String eachline;
+//        System.out.println("-------------------");
+        int count=0;
+        Set<String> tmpCheck = new HashSet<>();
+        while (null != (eachline = br.readLine())) {
+
+            String[] arr = eachline.split("\t");
+            if(arr.length<10)
+                continue;
+
+            String fname = arr[1];
+            if(!fname.contains("."))
+                continue;
+
+            if(checkSet.contains(fname) && !tmpCheck.contains(fname)) {
+                System.out.println(arr[1]);
+                System.out.println(eachline);
+                tmpCheck.add(fname);
+
+                count++;
+            }
+
+        }
+
+
+        System.out.println(count + "\t" + checkSet.size());
+
+        br.close();
+    }
+}

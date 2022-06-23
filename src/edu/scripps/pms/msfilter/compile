@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "compiling";
+javac -classpath . MSFilter.java
+jar cvf MSFilter.jar *.class

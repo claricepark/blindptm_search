@@ -1,0 +1,452 @@
+Changelog for DTASelect
+
+1.0
+Initial internal release
+
+1.1
+Allows maximum Sp filtering
+Examines only .out files now
+Can be run from arbitrary directories without recopying
+Treats multiple loci for DTA files like normal loci
+Uses absolute URL for marble.jpg
+Detects blank loci in .out files
+Changed default DeltCN and XCorr cutoffs
+Includes locus list in HTML comment
+Detects DeltCN on line 3 if line 2's is 0
+Added extra tab between filename and XCorr
+Corrected incorrect DeltCN detection
+Detects improperly short .out files
+Launches BLAST searches from Sequence
+Provides more feedback on status
+Lists options and settings in same order
+
+1.1.1
+Finds match #3 correctly even when loci names start with 3
+
+1.2
+Writes DTASelect.txt the first time run in a particular directory
+Reads DTASelect.txt if present rather than parsing .out files
+Looks up database name from sequest.params file
+Opens sequence database and matches identified loci to sequences
+Reads gene names and sequences from database
+Calculates unique sequence coverage per locus
+Calculates MW per locus
+Links to DisplayIons.CGI with correct modification info
+Indicates DTA files that are unique locus identifiers
+Includes Protein sequence length in HTML output
+Shows sequence context correctly for multilocus DTAs
+Leaves out locus list in HTML output
+Tests that files can be written before running
+Runs robustly even when SEQUEST matches are bogus
+Calculates pI and includes it in HTML report
+Provides extensive source code comments
+
+1.3
+Includes anchors for each locus in HTML report
+Uses table for selection criteria reporting
+First release of Contrast tool
+Allows removal of loci without unique peptide hits
+Allows retension of loci with redundant peptides
+Includes links to multi-locus locations
+Features a manual
+
+1.3.1
+Handles sequest.params specifying fewer than three differential mods
+Handles locus names with periods in second character
+Spells "loci" correctly
+Changes presentation of locus information for better printing
+Titles the Contrast output files more simply
+Handles variations in Contrast.params more robustly
+Reads database more quickly during matchup phase
+Groups together loci with identical supporting evidentiary DTAs
+Provides percentage information in Contrast summary
+Handles large numbers of spectra from same locus
+Handles -r option correctly
+Checks for database presence before reading .outs
+Checks that some .out files are found before continuing
+Handles loci not found in database more gracefully
+Prints DTASelect-filter.txt with only passing loci / peptides
+Counts loci found in each sample / criteria set for Contrast
+Provides verbose Contrast output (-v)
+Prints Contrast.txt file for easier spreadsheet import
+{Some changes missing ?}
+
+1.4
+Uses different DTASelect.txt file format for tryptic status
+Makes more compact DTASelect.HTML files
+Uses less memory for each spectrum's results
+Removes extra space before gene description
+Stratifies full tryptics from half tryptics
+Provides better flexibility in tryptic peptide handling
+Includes database name for each sample in Contrast.html
+Gives spectra per locus and sequences per locus in DTASelect.html
+Uses format like DTASelect.html for DTASelect-filter.txt
+Infers tryptic status correctly for peptides from multiple loci
+Terminates better when missing Contrast.params
+Links Contrast summary table to groups
+Produces XML output
+Correctly displays static modifications
+
+1.5
+Can be directed to .outs in current directory with -.
+Uses DTASelect.ini file for installation outside Yates Lab
+Looks for background graphic on DTASelect.ini web server
+Stores sequest.params information in DTASelect.txt
+Handles sequest.params from commercial installs
+Deals with multiple-residue differential mods correctly
+Announces the numbers of .out files in each subdirectory
+Enumerates modifications specified in sequest.params
+Allows copy option on UNIX or Windows
+Cues user when a commandline option is misunderstood
+Stores M+H+ mass for each spectrum
+Includes observed M+H+ instead of TIC in HTML output
+Adds DTASelect.params option for configuration
+Reads older DTASelect.txt files correctly
+Matches extremely long database names correctly
+Applies -r option for all peptides, not just uniques
+Writes DTASelect.html more quickly
+Detects differential modification correctly
+Applies -n option to all criteria
+Spells "Loci" correctly
+Documents source code more completely
+
+1.6
+Includes SpecView, Huffman, IDXFile, SPMFile, DTASelectGUI, Point,
+	 Spectrum, and TupleTable classes
+Implements a GUI for DTASelect result browsing
+Features an interpreted spectrum viewer
+Consolidates and compresses DTA files to IDX and SPM files
+Enhances Windows compatibility
+Checks for 0 samples or criteria sets in Contrast.params
+Locates database_name more flexibly within sequest.params
+Includes version number in IDX files
+Finds Huffman.ini anywhere in classpath
+Implements background graphic correctly for Contrast
+Handles pep and prot terminus mods from sequest.params for view
+Prints newline between grouped loci in filter.txt
+Prints newline after loci in DTASelect.html
+Merges peptides for Consensus CGI call (limiting to 70 residues)
+Includes Wysocki's sequence filters:
+   -Sic    Sequence includes all of (list of resiudes) before C
+	   terminus
+   -Sip    Sequence includes (pattern)
+   -Sec    Sequence excludes all of (list of residues) before C
+	   terminus : can be used for digest completion
+   -Stc    Ends in one of (list of residues)
+   -Stn    Last residue before sequence is one of (list of residues)
+Presents aggregate sequence coverage in Contrast
+Enumerates all options in DTASelect --help
+Includes sequence coverage viewer
+Uppercases database sequences
+Implements -X1, -X2, -X3 maximum XCorr cutoff criteria
+Corrects bug in database search
+Applies Lesser GNU Public License to TupleTable.java
+Understands [Options] section in Contrast.params
+Combines DTASelect.txt files in Contrast via "merge" option
+Uses Verbose Contrast mode via "verbose" option
+Groups together identical proteins in Contrast
+Unifies output generation code in Contrast
+Counts proteins the same in Contrast as in DTASelect
+Limits number of Contrast columns to 64
+Sets width of Contrast Description column
+
+1.7
+Segregates peptides by charge state before -t options
+Counts peptides per protein separated by charge state
+Sorts spectra together correctly on merge
+Finds XCorr correctly for verbose Contrast by Z
+Removes loci that are subsets of others with -o option
+Unifies code for criteria reporting
+Creates DTASelect-filter.txt files in Contrast as in DTASelect
+Checks for column count > 63 in Contrast
+Halts Contrasts when no proteins pass criteria
+Creates DTASelect-pst.txt to show protein similarity
+Includes peptide pI values in DTASelect-filter.txt
+Lists loci while comparing against database
+Displays spectra from DTAs if no compressed files present
+Prints no output files when running in GUI mode
+Groups proteins identically in DTASelect and Contrast
+Provides count of proteins and peptides in DTASelect GUI
+Counts proteins, peptides, and spectra exhaustively in DTASelect
+Prints message when starting to write DTASelect.txt
+Includes links to similar proteins in DTASelect.html
+Requires nonzero protein count for DTASelect output
+Produces DTASelect-chroma.txt for chromatography analysis
+Handles spaces in directory names for Contrast
+Allows samples or criteria sets to be hidden in Contrast
+Prints group summary lines in Contrast.html as in Contrast.txt
+Excludes loci whose names include a specified pattern
+Scrolls in response to keyboard on GUI
+Lists directory for sample after block of counts
+Creates XML report with --XML option
+Links to BLAST correctly
+Reports both nonredundant and redundant counts for Contrast
+Features MoreFASTA tool for database summarizing
+Produces Protein list for database import with --DB
+Produces peptide and protein/peptide tables for database import
+Enumerates spectra that score well as both +2 and +3
+Handles modified peptides more flexibly
+Lists peptides by sequence alignment
+Works with precompiled database results more effectively
+Uses completely new .out file parser for SEQUEST-SNP compatibility
+Provides friendlier .out error messages
+Includes -E (include only proteins with matching name)
+Includes -l (exclude proteins with matching descriptions)
+Includes -L (include only proteins with matching descriptions)
+Adds "Duplicate" field to DB-Proteins.txt
+Includes -M option for requiring loci to contain modified peptides
+Prints chroma report only with --chroma option
+Prints protein similarity table only with --similar option
+Prints modification report with --mods option
+<- LAST XML DTD UPDATE ->
+Uses unified code for DTASelect and Contrast filtering
+Uses unified code for DTASelect and Contrast reporting
+Prints alignment report with --align option
+Titles HTML files more briefly for task switching ease
+Handles larger numbers of identical spectrum copies
+
+1.8
+Uses more concise DTASelect.txt file format
+Produces 15% smaller DTASelect.html files
+Handles new differential search options in sequest.params
+    dm_standard <symbol> <mass> <residues>
+    dm_nterm	<symbol> <mass> <sequence position limit>
+    dm_nloss	<symbol> <mass> <residues>
+		<precursor neutral loss>
+		<fragment neutral loss>
+Includes spectrum viewer applet
+Reports unfiltered locus and ID counts
+Creates display_ions links with only necessary information
+Reports unfiltered .out file counts
+Records protein, file, and ID counts in DTASelect.txt
+Checks for 0.0 XCorr in .out files
+Makes links to "show" CGI with --CGI option
+Makes case-insensitive comparisons for -l, -L
+Displays identified TIC percentage in spectrum viewer
+Zooms in on selected spectrum section
+Can read .sqt files in lieu of .outs
+Determines peptide Z, mod for unfound proteins, too
+Infers peptide-protein uniqueness from .SQT files, too
+Detects incorrect diff_mods line in sequest.params
+Marks pta folder identifications with "P"
+Stores and reports manual validation information
+Specifies reliance on peptide validations by -v
+Specifies reliance on locus validations by -V
+Notes when no description is present in database
+Allows fragment ions to be +- 1.0 m/z
+Uses brighter red for singly charged b's.
+Communicates with SeqCov CGI
+Launches the EvalocusA CGI for protein validation
+Permits more flexible CGI server configuration
+Limits all protein names to 18 characters
+Uppercases .out files sequences
+Marks phs identifications with "P"
+Groups DTASelect proteins by user classifications
+Shows counts for each classification
+Creates DB-Classes.txt for --class --DB output
+Includes class information in DB-Proteins.txt
+Includes sequence and spectrum counts in DB-Proteins.txt
+Uses more detailed format for DTASelect-align.txt
+Uses configurable cutoff length for locus names
+Generates Bird's Eye View for samples with --BE option
+Sorts proteins in DTASelect by class, sequence coverage, MW
+Handles Bioworks3 sequest.params
+Handle Bioworks 3 .out files
+Implements classifications in --mod report
+Incorporates protein info from aux file
+Records residue modified in N line of -mods.txt
+Traps NumberFormatExceptions in ReadSQT
+Traps NoSuchElementExceptions in ReadSQT
+Omits '%' in DB-Proteins output
+Omits '%' in DB-Peptides output
+Uses less memory when reading DTASelect.txt
+DB-Prot2Pep includes both sequence positions and tryptic nature
+Displays protein validation symbol at left above peptide validations
+Sorts Contrast groups by descending prolificity
+Allows reversal of background and font colors for Bird's Eye
+Allows deactivation of title in Bird's Eye
+<Vive La France!>
+Allows global .out ID field inclusion configuration
+Expects .out ID field in additional locus lines as well
+Handles new format sequest.params DB enumeration better
+Gives better information when DTASelect.txt read fails
+Gives residue content by locus in MoreFASTA report
+Handles only DTASelect 1.5 (?) and later DTASelect.txt files
+Merges large DTASelect.txts far more memory-efficiently
+Labels precursor neutral losses in SpecView
+      *		 17    Ammonia
+      o		 18    Water
+      Act	 42    Acetylation of lysine residues
+      Phs	 98    Phosphorylation
+Prints version number instead of criteria when DTASelect is run
+Notes when incorrect lines are read from DTASelect.ini
+Notes when incorrect lines are read from BirdsEye.ini
+Detects ID fields in .out files dynamically
+Looks for lower half of .out file more flexibly
+Draws DB name only from database_name or
+      second_database_name in sequest.params
+Allows customized BLAST calls
+Accepts custom protein validation CGIs (bugfix)
+<Sabertooth 6/07/02>
+Keeps going even if last S in SQT has no Ms.
+Exits if .hdr or .bin database is indicated
+Includes Z field in DB-Peptides.txt
+Implements -v -1 and -V -1 for showing only N evaluations
+Traps NumberFormatExceptions in ParamsFile.ReadFile
+Traps NoSuchElementExceptions in ParamsFile.ReadFile
+Uses uniform capitalization for criteria reporting
+Filters on basis of precursor m/z: --mz --MZ
+Filters on basis of protein molwt: --mw --MW
+Uses lowercase for modification in DTASelect-align.txt
+Shows all options in usage (--help) info
+Subsets .sqt and .ms2 files with --copy
+Draws database name from first_database_name, too
+Reads identifications from Mascot-format .dat files (--Mascot)
+Reads configuration from Mascot-format .dat files
+Detects identical proteins by sequence even with --CGI use
+Omits the marble background in DTASelect on --NoBackground
+Sorts loci by class in Contrast with "Class" option
+Writes lists of copy commands to copylist.bat or copylist.bash
+Stores Mascot installation directory in DTASelect.ini
+Gets database path correctly with --Mascot
+Allows explicit DAT targetting via DTASelect.params [DAT List]
+Rounds Mascot DeltCNs to nearest .01 (for GUI)
+Replaces "XCorr" labels when --Mascot (DTASelect.html and GUI)
+Read second Mascot sequence matches if they score the same
+Filters loci on basis of pI with --pi and --PI options
+Includes more tick marks in SpectrumApplet when zooming
+Uses longest locus name in database subsetting
+Allows omission of most tags in SpectrumApplet calls
+Displays spectra correctly from .dtas (broken ~6 months?)
+Labels ammonia loss ions in SpecView
+Reads MS2 files for GUI spectrum viewer
+Sorts loci in same order on GUI as in HTML
+Reports similarity correctly with nonalpha peptide sort
+Produces peptide "+" links more efficiently
+Features more flexible GUI for SpectrumApplet
+Displays a ion series in spectrum viewer
+Displays +2 fragment ions in +2 spectra optionally
+Calculates fragment ion intensity percentage at spectrum read
+Tolerates different JVM implementations of File(File,String)
+Handles [DAT List] more correctly than before
+Includes Windows batch files for easier installation
+<Aquinas 10/1/02>
+Accepts "LoMZ" and "HiMZ" range setting in SpectrumApplet
+Adds extra proton to doubly charged fragment ions in SpecView
+Accepts "ShowPrecursorLosses" setting in SpectrumApplet
+Stops confusion of mass_type lines in sequest.params
+Prints table showing 2-way sample comparisons in Contrast
+Handles NoBackground in Contrast.params [Options]
+Implements [Explicit Mappings] section of Contrast.params
+Shows grouped protein names in --mods, --align
+Can show sequencing ladders in SpectrumApplet with these tags:
+    LadderLength<x>
+    LadderSeries<x>
+    LadInt<y>
+    LadMZ<y>
+Displays no background graphic in HTML output
+Allows assignment of "Master" column in Contrast
+Shows criteria sets side-by-side in Contrast.html
+<Primrose 12/20/02>
+Allows blank after mascot-path in DTASelect.ini
+Displays incomplete sequences via SpecView
+
+1.9 <1/16/03>
+Reads, stores, and reports peptide Sp scores
+Reads, stores, and reports peptide calculated masses
+Detects and stores number of equivalent matches for peptides
+Detects and stores ID format (SQT / OUT / Mascot)
+Activates --CGI mode if SQT format used
+Subsets if SQT format used on --copy
+Makes copy script if SQT format used on --copy
+Detects and stores IDs' originator (SEQUEST / Mascot)
+Labels report and GUI columns appropriately by ID originator
+Formats peptide data in tables for DTASelect.html
+Filters sequences on completeness: -Ser 0, 1, 2
+Filters peptides on Sp Score minimum: -S
+Omits peptide pI values from DTASelect-filter.txt
+Ends rounding of values in DB-Peptides.txt
+Allows selection of ion series in GUI
+Resizes GUI to larger default resolution
+Uses CSS to set protein and peptide font properties
+Merges only DTASelect.txt files from v1.9
+Names columns correctly for alternative algorithms in GUI
+Rounds SpScore in GUI
+Correctly displays partial sequences in applet
+Defaults to monoisotopic masses in SpecView
+Uses alternate column headings appropriately in Contrast
+Permits multiple -e -E -l -L filters simultaneously
+Reduces memory requirements when -e -E -l -L in use
+Reduces memory requirements when --mw --MW --pi --PI in use
+Reduces memory requirements when -V in use
+Filters IDs with multiple, ambiguous IDs on -a false
+Reports all Zs observed for spectra (replaces + links)
+Reads algorithm type from SQT header in new format
+Continues subsetting SQTs through file corruptions
+Hints that --here or -. is necessary when no .outs found
+Requires full CGI URLs in DTASelect.ini
+Chooses CGI automatically on data type
+Chooses depth sequence coverage viewer from DTASelect.ini
+Gives ln(intensity sum) in SpecView
+Gives peak count in SpecView
+Updates %TIC dynamically in SpecView
+Fixes HTML in --mods report
+Labels SpecView stats
+
+<Sappho 08/26/04>
+Changes from Microsoft's JVM to Sun's JVM
+Fixes a bug: Calc(M+H) is correctly displayed (rather than 0)
+Spectral count option added to Contrast
+
+<- LAST MANUAL UPDATE ->
+
+New charge state: +4  
+Bug for --chroma fixed, 
+Star for unique peptides in verbose Contrast
+DBDigger header option
+--copy option works for new MS2 file format
+--dcn option introduced (not documented)
+--pI option introduced (not documented)
+
+
+Possible bugs:
+Spurious "Line too short" errors in Mascot .dat read?
+Mascot truncates locus names at 2nd |; breaks DTASelect DB lookup
+
+To do:
+Evolve away from sequest.params dependence
+DB output for criteria?
+Display sequences with unusual characters correctly in SpecView
+Default DTASelect command-line in DTASelect.params?
+Speed up SQT subsetting on --copy
+M: Mockup filenames for non-dtas
+M: Read "total intensity" from Mascot .dat files
+M: Hook to CGIs for Mascot
+Allow for --compress from MS2 files
+Check for zero length .out files?
+Allow legend configuration in Bird's Eye:
+      1) Minimum
+      2) Maximum
+      3) # of grades displayed
+      4) Which field displayed
+Sort order for proteins to
+     1) Seq Coverage
+     2) # of peptide hits
+     3) Descrip
+     4) Locus
+     5) Aux
+Sort proteins by seqcov in Contrast groups?
+Add DB-style output for Contrast?
+Report utility settings in reporting criteria?
+Update XML
+Set up SpecView labile modification view?
+
+To consider:
+Add horizontal scrolling for TupleTable
+Implement GUI for setting parameters
+Handle multiple database sources (new version number)
+Store one copy of each match, with flanking sequence and links stored
+      in a separate object, chained from Protein object
+Max peps per locus filter?
+Be able to clone Protein lists for faster Contrast?
+Figure out how to deal with "-t 0" in counting?

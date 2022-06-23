@@ -1,0 +1,10 @@
+#QCorr Paramters
+InjWindow		4	#Isolation window size
+MassAccuracy		0.1	#bin width for binning out spectra
+Normalize		false	#normalizes mass spectra before cross correlation
+FilterPeaks		false	#sorts peaks by intensity and only uses peaks with rank above PeakThreshold for correlation
+PeakThreshold		200	#minimum rank of peak threshold
+
+#Output
+OutputFile	true	#creates precusors.txt file containing calculated weights and correlation scores 
+OutputCCArray	false	#outputs CC array file

@@ -1,0 +1,111 @@
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	AvgMasses['L' - 65] = 113.1594f;
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	AvgMasses['I' - 65] = 113.1594f;
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	AvgMasses['X' - 65] = 113.1594f;
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	MonoMasses['B' - 65] = 114.53494f;
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	MonoMasses['D' - 65] = 115.02694f;
+./edu/scripps/pms/DTASelect2.0/ParamsFile.java:	MonoMasses['K' - 65] = 128.09496f;
+./edu/scripps/pms/blindptm/BlindSearchEngine.java:        "H\tComment Ref. J. Am. Soc. Mass Spectrom., 1994, 4, p. 976\n"+
+./edu/scripps/pms/blindptm/DistributionCalculator.java:        76.18009172947146, -86.50532032941677, 24.01409824083091,
+./edu/scripps/pms/blindptm/MassCalculator.java://    public static final double HMASS = 1.00794f; // avg 
+./edu/scripps/pms/blindptm/MassCalculator.java://    public static final double H2OMASS = 15.9994f; // avg
+./edu/scripps/pms/blindptm/MassCalculator.java:        avgAaMasses['L'] = 113.15944f;   monoAaMasses['L'] = 113.0840636f;
+./edu/scripps/pms/blindptm/MassCalculator.java:        avgAaMasses['I'] = 113.15944f;   monoAaMasses['I'] = 113.0840636f;
+./edu/scripps/pms/blindptm/MassCalculator.java:        avgAaMasses['X'] = 113.15944f;   monoAaMasses['X'] = 113.0840636f;
+./edu/scripps/pms/blindptm/MassCalculator.java:        avgAaMasses['D'] = 115.08860f;   monoAaMasses['D'] = 115.0269428f;
+./edu/scripps/pms/blindptm/MassCalculator.java:        avgAaMasses['K'] = 128.17408f;   monoAaMasses['K'] = 128.0949626f;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[1][4] = 0.007894;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[5][4] = 0.299194;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[9][0] = 0.234948;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[9][12] = 0.001194;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[12][3] = 0.994691;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[12][9] = 0.099472;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[14][14] = 0.003941;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[16][4] = 0.945007;
+./edu/scripps/pms/blindptm/MassCalculator.java:        isotopicDistribution[17][6] = 0.945614;
+./edu/scripps/pms/blindptm/MassSpecConstants.java:    public static final float log10 = 0.434294481f;
+./edu/scripps/pms/blindptm/MassSpecConstants.java:    public static final float MASSH2O = 15.9949145f + 2*MASSHATOM;
+./edu/scripps/pms/blindptm/SearchParams.java:                case 94 : leftshift1 = 3; leftshift2 = 8; leftshift3 = 14; break;
+./edu/scripps/pms/blindssptm/BlindSearchEngine.java:        "H\tComment Ref. J. Am. Soc. Mass Spectrom., 1994, 4, p. 976\n"+
+./edu/scripps/pms/blindssptm/DistributionCalculator.java:        76.18009172947146, -86.50532032941677, 24.01409824083091,
+./edu/scripps/pms/blindssptm/MassCalculator.java://    public static final double HMASS = 1.00794f; // avg 
+./edu/scripps/pms/blindssptm/MassCalculator.java://    public static final double H2OMASS = 15.9994f; // avg
+./edu/scripps/pms/blindssptm/MassCalculator.java:        avgAaMasses['L'] = 113.15944f;   monoAaMasses['L'] = 113.0840636f;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        avgAaMasses['I'] = 113.15944f;   monoAaMasses['I'] = 113.0840636f;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        avgAaMasses['X'] = 113.15944f;   monoAaMasses['X'] = 113.0840636f;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        avgAaMasses['D'] = 115.08860f;   monoAaMasses['D'] = 115.0269428f;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        avgAaMasses['K'] = 128.17408f;   monoAaMasses['K'] = 128.0949626f;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[1][4] = 0.007894;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[5][4] = 0.299194;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[9][0] = 0.234948;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[9][12] = 0.001194;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[12][3] = 0.994691;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[12][9] = 0.099472;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[14][14] = 0.003941;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[16][4] = 0.945007;
+./edu/scripps/pms/blindssptm/MassCalculator.java:        isotopicDistribution[17][6] = 0.945614;
+./edu/scripps/pms/blindssptm/MassSpecConstants.java:    public static final float log10 = 0.434294481f;
+./edu/scripps/pms/blindssptm/MassSpecConstants.java:    public static final float MASSH2O = 15.9949145f + 2*MASSH;
+./edu/scripps/pms/blindssptm/SearchParams.java:                case 94 : leftshift1 = 3; leftshift2 = 8; leftshift3 = 14; break;
+./edu/scripps/pms/enrichmentcalc/IsotopeDistribution.java://	enrichment = 0.94;
+./edu/scripps/pms/enrichmentcalc/IsotopeDistribution.java:        abund[2][1] = 0.03799194;
+./edu/scripps/pms/enrichmentcalc/IsotopeDistribution.java:	//iso.setEnrichment(0.94);
+./edu/scripps/pms/enrichmentcalc/IsotopeDistribution.java:            (element[2] * 15.9949146)
+./edu/scripps/pms/enrichmentcalc/IsotopeDistribution.java:            (element[2] * 15.9949146)
+./edu/scripps/pms/mspid/Chisquare.java:	cof[0] = 76.18009172947146;
+./edu/scripps/pms/mspid/Chisquare.java:	cof[1] = -86.50532032941677;
+./edu/scripps/pms/mspid/DistributionCalculator.java:        76.18009172947146, -86.50532032941677, 24.01409824083091,
+./edu/scripps/pms/mspid/MassCalculator.java://    public static final double HMASS = 1.00794f; // avg 
+./edu/scripps/pms/mspid/MassCalculator.java://    public static final double H2OMASS = 15.9994f; // avg
+./edu/scripps/pms/mspid/MassCalculator.java:        monoResidueMasses['D'] = 115.0269428;
+./edu/scripps/pms/mspid/MassCalculator.java:        monoResidueMasses['K'] = 128.0949626;
+./edu/scripps/pms/mspid/MassCalculator.java:        avgAaMasses['L'] = 113.15944f;   monoAaMasses['L'] = 113.0840636f;
+./edu/scripps/pms/mspid/MassCalculator.java:        avgAaMasses['I'] = 113.15944f;   monoAaMasses['I'] = 113.0840636f;
+./edu/scripps/pms/mspid/MassCalculator.java:        avgAaMasses['X'] = 113.15944f;   monoAaMasses['X'] = 113.0840636f;
+./edu/scripps/pms/mspid/MassCalculator.java:        avgAaMasses['D'] = 115.08860f;   monoAaMasses['D'] = 115.0269428f;
+./edu/scripps/pms/mspid/MassCalculator.java:        avgAaMasses['K'] = 128.17408f;   monoAaMasses['K'] = 128.0949626f;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[1][4] = 0.007894;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[5][4] = 0.299194;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[9][0] = 0.234948;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[9][12] = 0.001194;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[12][3] = 0.994691;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[12][9] = 0.099472;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[14][14] = 0.003941;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[16][4] = 0.945007;
+./edu/scripps/pms/mspid/MassCalculator.java:        isotopicDistribution[17][6] = 0.945614;
+./edu/scripps/pms/mspid/MassSpecConstants.java:    public static final float log10 = 0.434294481f;
+./edu/scripps/pms/mspid/MassSpecConstants.java:    public static final float MASSH2O = 15.9949145f + 2*MASSH;
+./edu/scripps/pms/mspid/SearchParams.java:                case 94 : leftshift1 = 3; leftshift2 = 8; leftshift3 = 14; break;
+./edu/scripps/pms/mspid/TopDownSearchEngine.java:        "H\tComment Ref. J. Am. Soc. Mass Spectrom., 1994, 4, p. 976\n"+
+./edu/scripps/pms/pmsdb/Pmsdb.java:            //int [] experimentIds = {892, 894}; // for two-pass results
+./edu/scripps/pms/qcorr/MassSpecConstants.java:    public static final float log10 = 0.434294481f;
+./edu/scripps/pms/qcorr/MassSpecConstants.java:    public static final float MASSH2O = 15.9949145f + 2*MASSH;
+./edu/scripps/pms/tools/IsotopeDistribution.java://	enrichment = 0.94;
+./edu/scripps/pms/tools/IsotopeDistribution.java:        abund[2][1] = 0.03799194;
+./edu/scripps/pms/tools/IsotopeDistribution.java:	//iso.setEnrichment(0.94);
+./edu/scripps/pms/tools/IsotopeDistribution.java:            (element[2] * 15.9949146)
+./edu/scripps/pms/tools/IsotopeDistribution.java:            (element[2] * 15.9949146)
+./edu/scripps/pms/topdown/DistributionCalculator.java:        76.18009172947146, -86.50532032941677, 24.01409824083091,
+./edu/scripps/pms/topdown/MassCalculator.java://    public static final double HMASS = 1.00794f; // avg 
+./edu/scripps/pms/topdown/MassCalculator.java://    public static final double H2OMASS = 15.9994f; // avg
+./edu/scripps/pms/topdown/MassCalculator.java:        avgAaMasses['L'] = 113.15944f;   monoAaMasses['L'] = 113.0840636f;
+./edu/scripps/pms/topdown/MassCalculator.java:        avgAaMasses['I'] = 113.15944f;   monoAaMasses['I'] = 113.0840636f;
+./edu/scripps/pms/topdown/MassCalculator.java:        avgAaMasses['X'] = 113.15944f;   monoAaMasses['X'] = 113.0840636f;
+./edu/scripps/pms/topdown/MassCalculator.java:        avgAaMasses['D'] = 115.08860f;   monoAaMasses['D'] = 115.0269428f;
+./edu/scripps/pms/topdown/MassCalculator.java:        avgAaMasses['K'] = 128.17408f;   monoAaMasses['K'] = 128.0949626f;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[1][4] = 0.007894;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[5][4] = 0.299194;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[9][0] = 0.234948;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[9][12] = 0.001194;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[12][3] = 0.994691;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[12][9] = 0.099472;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[14][14] = 0.003941;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[16][4] = 0.945007;
+./edu/scripps/pms/topdown/MassCalculator.java:        isotopicDistribution[17][6] = 0.945614;
+./edu/scripps/pms/topdown/MassSpecConstants.java:    public static final float log10 = 0.434294481f;
+./edu/scripps/pms/topdown/MassSpecConstants.java:    public static final float MASSH2O = 15.9949145f + 2*MASSH;
+./edu/scripps/pms/topdown/TopDownSearchEngine.java:        "H\tComment Ref. J. Am. Soc. Mass Spectrom., 1994, 4, p. 976\n"+
+./edu/scripps/pms/util/isotope/IsotopeDist.java:        abund[2][1] = 0.03799194;
+./edu/scripps/pms/util/isotope/IsotopeDist.java:            (element[2] * 15.9949146)
+./edu/scripps/pms/util/stats/Fisher.java:        x += 1.6594701874084621E-007D / (double)(z + 7);
+./edu/scripps/pms/webfw/db/ModProjectDBHandler.java:                  Nonredundant    661     949     2559
+./edu/scripps/pms/webfw/db/ProjectDBHandler.java:                  Nonredundant    661     949     2559
