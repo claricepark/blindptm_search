@@ -17,13 +17,35 @@ public class ReadFasta {
         //ecah potein, create FastaProtein object and add to List (ArrayList)
 
         List<ReadFasta> proteinList = new ArrayList();
-        FastaProtein protein = new FastaProtein();
+        FastaProtein protein = null;
         BufferedReader br = new BufferedReader(new FileReader(inputFile));
         StringBuffer sb = new StringBuffer();
 
-        String define = br.readLine(); //> line
-        String description = define.substring(1);
-        // if the line read is a empty string, ignore it
+        String eachLine = null;
+        //1. create FastaProtein object
+        //2. set values correctly
+        //3. add them to proteinList
+        while ( (eachLine = br.readLine()) != null) {
+
+            /*
+            if(eachLine.equals(""))
+                continue;
+
+            String defLine = eachLine.substring(1);
+
+            //while ( ((eachLine = br.readLine()) != null) && !eachLine.startsWith(">") )
+            while(   ((eachLine = br.readLine()) != null) && !eachLine.startsWith(">") ) {
+
+                sb.append(eachLine);
+            }
+
+            //new FastaProtein();
+            */
+
+
+            System.out.println(eachLine);
+        }
+        /*
         while ((define = br.readLine()) != null && (define.equals("") || define.charAt(0) != '<')) {
             if(define.equals("")){
                 continue;
@@ -31,14 +53,14 @@ public class ReadFasta {
                 String line = define.trim();
                 sb.append(line);
             }else if(description.substring(0,1).equals(">")){
-                proteinList.add(protein.setDescription(sb));
+                proteinList.add(protein.setDescription(sb.toString()));
             }else{
-                proteinList.add(protein.setSequence(sb));
+                proteinList.add(protein.setSequence(sb.toString()));
             }
         }
+        */
 
         System.out.println(proteinList);
-        sb.setLength(0);
         br.close();
     }
 
