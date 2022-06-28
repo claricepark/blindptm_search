@@ -25,9 +25,6 @@ public class DtaReader {
                     data.add(arr[0]);
                 }
             }
-
-
-
         }
         System.out.println(data);
 

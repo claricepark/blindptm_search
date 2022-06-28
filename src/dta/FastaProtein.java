@@ -10,7 +10,7 @@ public class FastaProtein {
         return extension;
     }
 
-    public void setAccetion(String accetion) {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
@@ -29,4 +29,5 @@ public class FastaProtein {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
