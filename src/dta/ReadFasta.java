@@ -16,8 +16,7 @@ public class ReadFasta {
         //read fasta file.
         //ecah potein, create FastaProtein object and add to List (ArrayList)
 
-        List<ReadFasta> proteinList = new ArrayList();
-        FastaProtein protein = null;
+        List<FastaProtein> proteinList = new ArrayList();
         BufferedReader br = new BufferedReader(new FileReader(inputFile));
         StringBuffer sb = new StringBuffer();
 
@@ -25,40 +24,33 @@ public class ReadFasta {
         //1. create FastaProtein object
         //2. set values correctly
         //3. add them to proteinList
-        while ( (eachLine = br.readLine()) != null) {
 
-            /*
-            if(eachLine.equals(""))
-                continue;
+        eachLine = br.readLine();
+        while (true) {
+
+
 
             String defLine = eachLine.substring(1);
 
-            //while ( ((eachLine = br.readLine()) != null) && !eachLine.startsWith(">") )
             while(   ((eachLine = br.readLine()) != null) && !eachLine.startsWith(">") ) {
+                if(eachLine.equals(""))
+                    continue;
 
                 sb.append(eachLine);
             }
 
-            //new FastaProtein();
-            */
+            FastaProtein protein = new FastaProtein();
+            protein.setDescription(defLine);
+            protein.setSequence(sb.toString());
 
+            proteinList.add(protein);
+            sb.delete(0, sb.length());
 
-            System.out.println(eachLine);
+            if(eachLine == null)
+                break;
+       //     System.out.println(protein);
         }
-        /*
-        while ((define = br.readLine()) != null && (define.equals("") || define.charAt(0) != '<')) {
-            if(define.equals("")){
-                continue;
-            }else if (!define.equals("")) {
-                String line = define.trim();
-                sb.append(line);
-            }else if(description.substring(0,1).equals(">")){
-                proteinList.add(protein.setDescription(sb.toString()));
-            }else{
-                proteinList.add(protein.setSequence(sb.toString()));
-            }
-        }
-        */
+
 
         System.out.println(proteinList);
         br.close();
