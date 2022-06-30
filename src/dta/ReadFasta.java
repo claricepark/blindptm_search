@@ -1,14 +1,12 @@
 package dta;
 
-import org.apache.axis2.context.externalize.DebugObjectInput;
-
 import java.io.FileReader;
 import java.util.*;
 import java.io.BufferedReader;
 
 public class ReadFasta {
 
-    private String lastLine;
+    static List<FastaProtein> proteinList;
 
     public static void main(String[] args) throws Exception {
 
@@ -16,7 +14,8 @@ public class ReadFasta {
         //read fasta file.
         //ecah potein, create FastaProtein object and add to List (ArrayList)
 
-        List<FastaProtein> proteinList = new ArrayList();
+        //List<FastaProtein> proteinList = new ArrayList();
+        proteinList = new ArrayList<FastaProtein>();
         BufferedReader br = new BufferedReader(new FileReader(inputFile));
         StringBuffer sb = new StringBuffer();
 
@@ -28,17 +27,12 @@ public class ReadFasta {
         eachLine = br.readLine();
         while (true) {
 
-
-
             String defLine = eachLine.substring(1);
-
             while(   ((eachLine = br.readLine()) != null) && !eachLine.startsWith(">") ) {
                 if(eachLine.equals(""))
                     continue;
-
                 sb.append(eachLine);
             }
-
             FastaProtein protein = new FastaProtein();
             protein.setDescription(defLine);
             protein.setSequence(sb.toString());
@@ -48,12 +42,16 @@ public class ReadFasta {
 
             if(eachLine == null)
                 break;
-       //     System.out.println(protein);
         }
 
-
-        System.out.println(proteinList);
+        //System.out.println(proteinList);
         br.close();
+    }
+
+    public static List<FastaProtein> getList() {
+
+        return proteinList;
+
     }
 
 }

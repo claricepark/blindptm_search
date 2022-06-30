@@ -5,13 +5,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 public class DtaReader {
-    public static void main(String[] args) throws Exception {
+
+    public static void read() throws Exception {
 
         String inputFile = "/Users/claricepark/data/blindptm/DTASelect-filter.txt";
-        //String inputFile = args[0];
-        String eachLine = null;
-        Set<String> data = new HashSet<String>();
         BufferedReader br = new BufferedReader(new FileReader(inputFile));
+        //String inputFile = args[0];
+
+        Set<String> data = new HashSet<String>();
+        String eachLine = null;
         while ((eachLine = br.readLine()) != null) {
             String[] arr = eachLine.split("\t");
 
@@ -30,12 +32,11 @@ public class DtaReader {
 
         br.close();
     }
+
+    public static Set<String> getHashSet() {
+
+        return data;
+    }
+
 }
-
-
-    //class name starts with uppercase
-    //method name starts with lowercase
-    //no underscore (it is c++ coding style). e.g. myRunningMethod
-
-    //  /Users/claricepark/data/blindptm/DTASelect-filter.txt
 
