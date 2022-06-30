@@ -17,7 +17,7 @@ public class DtaFasta {
         BufferedWriter bw = null;
 
         ReadFasta.getList();
-        DtaReader.getHashSet();
+        //DtaReader.getHashSet();
 
         File textFile = new File("FastaMatch.txt");
         try {
@@ -27,17 +27,17 @@ public class DtaFasta {
         }
 
         //int listsz = ReadFasta.proteinList.size();
-        for (FastaProtein i : ReadFasta.proteinList) {
-            for (FastaProtein j : DtaReader.data) {
-                if (i.equals(j)) {
-                    combine.add(String.valueOf(j));
-
-                }
-
-            }
-        }System.out.println(combine);
-        bw.write(combine + "\n");
-        bw.close();
+//        for (FastaProtein i : ReadFasta.proteinList) {
+//            for (FastaProtein j : DtaReader.data) {
+//                if (i.equals(j)) {
+//                    combine.add(String.valueOf(j));
+//
+//                }
+//
+//            }
+//        }System.out.println(combine);
+//        bw.write(combine + "\n");
+//        bw.close();
 
 
     }
