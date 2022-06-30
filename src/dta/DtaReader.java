@@ -6,6 +6,8 @@ import java.io.FileReader;
 
 public class DtaReader {
 
+
+
     public static void read() throws Exception {
 
         String inputFile = "/Users/claricepark/data/blindptm/DTASelect-filter.txt";
