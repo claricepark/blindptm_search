@@ -26,23 +26,19 @@ public class DtaFasta {
             e.printStackTrace();
         }
 
-        String line;
         //int listsz = ReadFasta.proteinList.size();
         for (FastaProtein i : ReadFasta.proteinList) {
             for (FastaProtein j : DtaReader.data) {
                 if (i.equals(j)) {
-                    combine.add(String.valueOf(i));
+                    combine.add(String.valueOf(j));
 
                 }
-                try {
-                    if (bw != null)
-                        bw.close();
-                } catch (IOException e) {
-                    //
-                }
+
             }
         }System.out.println(combine);
         bw.write(combine + "\n");
+        bw.close();
+
 
     }
 
