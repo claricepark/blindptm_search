@@ -1,45 +1,52 @@
 package dta;
 
+import java.io.*;
 import java.util.*;
-import java.io.FileReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 
 public class DtaFasta {
 
     public static void main(String[] args) throws Exception {
 
-        List<String> combine = new ArrayList();
 
-        BufferedWriter bw = null;
+        String inputFile = "/Users/claricepark/data/blindptm/DTASelect-filter.txt";
+        String outputPath = inputFile.substring(0, inputFile.lastIndexOf('/')) + File.separator + "identified.fasta";
 
-        ReadFasta.getList();
-        //DtaReader.getHashSet();
+        //subset fasta file: "/Users/claricepark/data/blindptm/identified_subset.fasta";
+        Set<String> dtaProteinList = DtaReader.getProteinList(inputFile);
 
-        File textFile = new File("FastaMatch.txt");
-        try {
-            bw = new BufferedWriter(new FileWriter(textFile));
-        } catch (IOException e) {
-            e.printStackTrace();
+        //String inputFasta = "/Users/claricepark/data/blindptm/small.fasta";
+        String inputFasta = "/Users/claricepark/data/blindptm/UniProt_human_reviewed_contaminant_05-23-2020_reversed.fasta";
+        List<FastaProtein> fastaProteinList = ReadFasta.getFastaProteinList(inputFasta);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath));
+
+
+        Hashtable<String, FastaProtein> fastaHt = new Hashtable<>();
+        for(FastaProtein fp:fastaProteinList) {
+           // String desc = fp.getDescription().split(" ")[0];
+            String key = "";
+            if(fp.getDescription().length()>=21)
+                key = fp.getDescription().substring(0,21);
+            else
+                key = fp.getDescription();
+
+            fastaHt.put(key, fp);
         }
 
-        //int listsz = ReadFasta.proteinList.size();
-//        for (FastaProtein i : ReadFasta.proteinList) {
-//            for (FastaProtein j : DtaReader.data) {
-//                if (i.equals(j)) {
-//                    combine.add(String.valueOf(j));
-//
-//                }
-//
-//            }
-//        }System.out.println(combine);
-//        bw.write(combine + "\n");
-//        bw.close();
+        Set<String> fastaProteinSet = fastaHt.keySet();
 
+        FileWriter fw = new FileWriter(outputPath);
 
+        for(String protein : dtaProteinList){
+
+            if(fastaProteinSet.contains(protein)) {
+                FastaProtein fp = fastaHt.get(protein);
+                System.out.println(fp.getDescription());
+                System.out.println(fp.getSequence());
+                writer.write(fp.getDescription());
+                writer.write(fp.getSequence());
+            }
+        }
     }
 
 }

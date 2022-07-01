@@ -6,17 +6,17 @@ import java.io.BufferedReader;
 
 public class ReadFasta {
 
-    static List<FastaProtein> proteinList;
-
     public static void main(String[] args) throws Exception {
+        getFastaProteinList( "/Users/claricepark/data/blindptm/small.fasta");
+    }
 
-        String inputFile = "/Users/claricepark/data/blindptm/identified.fasta";
-        //read fasta file.
-        //ecah potein, create FastaProtein object and add to List (ArrayList)
+    public static List<FastaProtein> getFastaProteinList(String fastaFile) throws Exception {
+
+        //String inputFile = "/Users/claricepark/data/blindptm/small.fasta";
 
         //List<FastaProtein> proteinList = new ArrayList();
-        proteinList = new ArrayList<FastaProtein>();
-        BufferedReader br = new BufferedReader(new FileReader(inputFile));
+        List<FastaProtein> proteins = new ArrayList();
+        BufferedReader br = new BufferedReader(new FileReader(fastaFile));
         StringBuffer sb = new StringBuffer();
 
         String eachLine = null;
@@ -37,7 +37,7 @@ public class ReadFasta {
             protein.setDescription(defLine);
             protein.setSequence(sb.toString());
 
-            proteinList.add(protein);
+            proteins.add(protein);
             sb.delete(0, sb.length());
 
             if(eachLine == null)
@@ -46,13 +46,10 @@ public class ReadFasta {
 
         //System.out.println(proteinList);
         br.close();
+        return proteins;
     }
 
-    public static List<FastaProtein> getList() {
 
-        return proteinList;
-
-    }
 
 }
 
