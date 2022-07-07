@@ -6,6 +6,7 @@
  */
 package edu.scripps.pms.blindptm;
 
+import dta.DtaFasta;
 import edu.scripps.pms.util.seq.Fasta;
 
 import java.net.*;
@@ -173,6 +174,29 @@ class BlindSearchEngine {
     public static void main(String args[]) throws Exception {
         try {
             String msFileName = args[0];
+
+            //call dtaFasta to this class
+            //grab new fasta file in this method
+//            DtaFasta.get(inputFastaFile);
+
+
+            //dtaFile
+            Scanner inScanner = new Scanner(System.in);
+            System.out.print("Enter file path:"); ///Users/claricepark/data/blindptm/search.xml
+            String DtaPathInput = inScanner.next();
+            String inputDtaFile = DtaPathInput; //"/Users/claricepark/data/blindptm/DTASelect-filter.txt";
+            System.out.println("You entered: " + DtaPathInput);
+            String outputPath = inputDtaFile.substring(0, inputDtaFile.lastIndexOf('/')) + File.separator + "identified.fasta";
+
+
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter second file path:");
+            String fastaPathInput = sc.next();
+            String inputFastaFile = fastaPathInput;//"/Users/claricepark/data/blindptm/UniProt_human_reviewed_contaminant_05-23-2020_reversed.fasta";
+            System.out.println("You entered: " + fastaPathInput);
+            DtaFasta.getIdenfitiedFasta(outputPath, fastaPathInput);
+
+            //args[1] = path + search.xml . e.g. /home/ip2/search.xml
             SearchParams sp = new SearchParams("search.xml");
             SearchResult.setNumOutput(sp.getNumOutput()); 
             // protein database 
