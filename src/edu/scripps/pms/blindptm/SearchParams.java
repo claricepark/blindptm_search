@@ -359,6 +359,7 @@ public class SearchParams {
             List<Element> residues = e.getChild("residues").getChildren();
             for(Element r : residues) {
                 byte c = (byte)r.getTextTrim().charAt(0);
+
                 sb.append("\t" + (char)c);
                 isModifiable[c] = true;
             }

@@ -43,12 +43,13 @@ public class DtaFasta {
         }
 
         Set<String> fastaProteinSet = fastaHt.keySet();
+        System.out.println("Output file successfully created");
 
         for(String protein : dtaProteinList){
 
             if(fastaProteinSet.contains(protein)) {
                 FastaProtein fp = fastaHt.get(protein);
-                System.out.println("Output file successfully created");
+                //System.out.println("Output file successfully created");
 //                System.out.println(fp.getDescription());
 //                System.out.println(fp.getSequence());
                 writer.write(">" + fp.getDescription());
